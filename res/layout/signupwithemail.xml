@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+     android:background="@color/white"
+     android:theme="@android:style/Theme.Holo.Light.NoActionBar">
+    
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/commentpageseekbar"
+        android:ems="10"
+        android:inputType="textEmailAddress" 
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/commentpageduration"
+        android:ems="10" 
+		android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <EditText
+        android:id="@+id/editText4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/commentpagedescription"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <Button
+        android:id="@+id/Signup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText4"
+        android:layout_alignRight="@+id/editText4"
+        android:layout_below="@+id/editText4"
+        android:layout_marginTop="17dp"
+        android:background="@color/grey"
+        android:paddingTop="0dp"
+        android:text="Sign Up"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+    <TextView
+        android:id="@+id/Posttitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/commentpageechocount"
+        android:layout_alignLeft="@+id/Signup"
+        android:layout_alignRight="@+id/Signup"
+        android:text="By tapping &quot;Sign Up&quot; above, you are agreeing to the Terms of Service and Privacy Policy, including Cookies use." />
+
+    <TextView
+        android:id="@+id/commentpageduration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText3"
+        android:layout_below="@+id/editText2"
+        android:text="Username"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/commentpagedescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/commentpageduration"
+        android:layout_below="@+id/editText3"
+        android:text="Password"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageView
+        android:id="@+id/dppic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/dp"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:id="@+id/UserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/commentpageseekbar"
+        android:layout_below="@+id/dppic"
+        android:text="Full Name"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText2"
+        android:layout_alignRight="@+id/editText2"
+        android:layout_below="@+id/UserName"
+        android:ems="10"
+        android:inputType="textPersonName" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/commentpageseekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/commentpagedescription"
+        android:layout_below="@+id/editText1"
+        android:text="Email"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/commentpageechocount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/commentpagedescription"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/Posttitle"
+        android:layout_marginBottom="34dp"
+        android:text="Your email address may be used to connect you with others, but will not be visible anywhere. You can update this in account settings." />
+
+</RelativeLayout>

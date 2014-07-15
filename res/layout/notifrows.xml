@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="10dp" 
+    android:paddingBottom="10dp"
+    
+    
+ >
+
+    <ImageView
+        android:id="@+id/dpnotifs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="2dp"
+         />
+
+    <ImageButton
+        android:id="@+id/playnotif"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/dpnotifs"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="25dp"
+        android:background="@android:color/transparent"
+        android:src="@android:color/transparent" />
+
+    <TextView
+        android:id="@+id/descriptionnotif"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/dpnotifs"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="14dp"
+        android:layout_marginLeft="72dp"
+        android:text="Madfresco"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/grey"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/descriptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/descriptionnotif"
+        android:layout_alignBottom="@+id/descriptionnotif"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_toRightOf="@+id/descriptionnotif"
+        android:text=" liked your "
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="17sp" 
+        android:textColor="@color/descriptioncolor"/>
+
+    <TextView
+        android:id="@+id/postclickable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/descriptions"
+        android:layout_alignBottom="@+id/descriptions"
+        android:layout_toRightOf="@+id/descriptions"
+        android:text="post"
+        android:textColor="@color/grey"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/postclickable"
+        android:layout_alignBottom="@+id/postclickable"
+        android:layout_alignParentRight="true"
+   		android:layout_marginRight="25dp"
+        android:text="3s"
+        android:textSize="12sp"
+        android:textColor="@color/descriptioncolor"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

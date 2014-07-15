@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:alpha="80"
+    android:background="@drawable/landing"
+    android:theme="@android:style/Theme.DeviceDefault.NoActionBar" >
+
+    <com.facebook.widget.LoginButton
+        android:id="@+id/fbloginlanding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/Signuplanding"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:background="@color/facebookblue"
+        android:paddingTop="0dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginLeft="25dp"
+        android:text="Sign Up with Facebook"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+    <Button
+        android:id="@+id/Signuplanding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/fbloginlanding"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/fbloginlanding"
+        android:layout_marginBottom="34dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/greyx"
+        android:paddingTop="0dp"
+        android:text="Sign up with your email"
+        android:textColor="@android:color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+</RelativeLayout>

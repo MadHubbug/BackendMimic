@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:background="@android:color/white" >
+
+    <ImageButton
+        android:id="@+id/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="33dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/playbutton" />
+
+    <EditText
+        android:id="@+id/description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/play"
+        android:layout_marginRight="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@+id/play"
+        android:ems="10"
+        android:hint="Add Description"
+        android:inputType="textMultiLine"
+        android:minHeight="40dp"
+        android:textColorLink="@android:color/black"
+        android:textSize="14sp"
+        android:maxLength="90" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/twittershare"
+        android:layout_below="@+id/description"
+        android:layout_marginTop="17dp"
+        android:text="Share"
+        android:textColor="@color/descriptioncolor"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView1"
+        android:src="@drawable/labeldivider" />
+
+    <ImageButton
+        android:id="@+id/twittershare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/play"
+        android:layout_below="@+id/imageView1"
+        android:layout_marginTop="13dp"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:paddingLeft="5dp"
+        android:src="@drawable/twitternot" />
+
+    <ImageButton
+        android:id="@+id/facebookshare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/description"
+        android:layout_alignTop="@+id/twittershare"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:paddingLeft="5dp"
+        android:src="@drawable/facebooknot" />
+
+</RelativeLayout>

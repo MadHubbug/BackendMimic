@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+   android:paddingTop="10dp" 
+    android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/commentdisplaypic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="3dp"
+        android:src="@drawable/dp" 
+        android:layout_marginLeft="16dp"/>
+
+    <TextView
+        android:id="@+id/commentusername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/commentdisplaypic"
+        android:layout_marginTop="14dp"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/commentdisplaypic"
+        android:text="Madfresco"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="15sp" />
+
+    <ImageButton
+        android:id="@+id/commentplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/commentdisplaypic"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/commentdisplaypic"
+        android:background="@android:color/transparent"
+        android:src="@drawable/playbutton" 
+        android:layout_marginRight="16dp"/>
+
+    <TextView
+        android:id="@+id/commenttimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/commentusername"
+        android:layout_alignTop="@+id/commentusername"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+
+        android:layout_toRightOf="@+id/commentusername"
+        android:text="10s"
+        android:textColor="@color/descriptioncolor"
+        android:textSize="9sp" />
+
+</RelativeLayout>

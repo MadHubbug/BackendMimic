@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#3D454E"
+            android:paddingTop="1dp" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="horizontal" >
+
+     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:id="@+id/lay" >
+                    <TextView
+                android:id="@+id/label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="15dp"
+                android:text="Post "
+                android:textSize="25dp"
+                android:layout_marginLeft="16dp"
+                android:textColor="@color/descriptioncolor"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/label"
+                android:src="@drawable/labeldivider" />
+        <ImageButton
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="15dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/close" />
+
+        <ImageButton
+            android:id="@+id/recordcomment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/close"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/recwhite" />
+         <ImageButton
+            android:id="@+id/playpostcomment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/recordcomment"
+            android:layout_alignLeft="@+id/recordcomment"
+            android:layout_marginTop="72dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/biggerplay" 
+            android:layout_centerHorizontal="true"/>
+         
+                 <TextView
+            android:id="@+id/countdowncomment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/recordcomment"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:text="30s"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/white" />
+         
+                 
+</RelativeLayout>
+        <ImageButton
+            android:id="@+id/nextbuttoncomment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lay"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop ="20dp"
+            android:background="@android:color/transparent"
+            android:paddingBottom="10dp"
+            android:src="@drawable/next" />
+
+
+        <ImageButton
+            android:id="@+id/deletecomment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@+id/nextbuttoncomment"
+            android:layout_marginLeft="33dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/delete" />
+
+
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+         
+         <LinearLayout
+             android:id="@+id/follows"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content" 
+             android:gravity="center"
+             android:orientation="horizontal"
+            android:layout_below="@+id/profheader"
+             >
+
+                
+             <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="match_parent" 
+             android:gravity="center"
+             android:orientation="vertical"
+             android:clickable="true"
+             android:layout_weight="1"
+             android:background="@drawable/border"
+             android:paddingTop="10dp"
+             android:paddingBottom="10dp">
+
+                 <TextView
+                     android:id="@+id/postcounts"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:background="@android:color/transparent"
+                     android:text="0"
+                     android:textSize="14sp" 
+                     />
+
+                 <TextView
+                     android:id="@+id/postlabel"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Mimic"
+                     android:textSize="14sp" />
+             </LinearLayout>
+             
+  		<LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="match_parent" 
+             android:gravity="center"
+             android:orientation="vertical"
+             android:clickable="true"
+             android:layout_weight="1"
+             android:background="@drawable/border">
+                 <TextView
+                     android:id="@+id/followertext"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                    
+                     android:text="0"
+                     android:textSize="14sp" />
+
+                 <TextView
+                     android:id="@+id/followerlabel"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Followers"
+                     android:textSize="14sp" />
+             </LinearLayout>
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="match_parent" 
+             android:gravity="center"
+             android:orientation="vertical"
+             android:clickable="true"
+             android:layout_weight="1"
+             android:background="@drawable/border">
+             
+             <TextView
+                 android:id="@+id/followingtext"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="0"
+                 android:textSize="14sp" />
+
+             <TextView
+                 android:id="@+id/followinglabel"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Following"
+                 android:textSize="14sp" />
+         </LinearLayout>
+         
+    </LinearLayout>
+    
+    <ListView
+        android:id="@+id/proflist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/footerprofpage"
+        android:layout_below="@+id/follows" >
+        
+    </ListView>
+
+    <LinearLayout
+        android:id="@+id/footerprofpage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="#F86960"
+        android:paddingTop="2dp" 
+        android:orientation="horizontal"
+        android:gravity="center" 
+        >
+
+        <ImageButton
+            android:id="@+id/homebuttonprofpage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dip"
+            android:layout_weight="1"
+            android:src="@drawable/homeunclicked" />
+
+        <ImageButton
+            android:id="@+id/explorebuttonprofpage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dip"
+            android:layout_weight="1"
+            android:src="@drawable/explorerunclicked" />
+
+        
+        <ImageButton
+            android:id="@+id/postbuttonprofpage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dip"
+            android:layout_weight="1"
+            android:src="@drawable/record" />
+
+        <ImageButton
+            android:id="@+id/notificationbuttonprofpage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dip"
+            android:layout_weight="1"
+            android:src="@drawable/notificationunclicked" />
+
+
+        <ImageButton
+            android:id="@+id/profilebuttonprofpage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dip"
+            android:layout_weight="1"
+            android:src="@drawable/profileclicked" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/profheader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/white" 
+        android:paddingBottom="15dp">
+
+        <ImageView
+            android:id="@+id/profilepic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/dp" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/postclickable"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="15dp"
+            android:background="@color/dividercolor"
+            android:padding="1dp" >
+
+            <ImageButton
+                android:id="@+id/editprof"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="32"
+                android:background="@android:color/transparent"
+                android:src="@drawable/editprof" />
+
+            <ImageButton
+                android:id="@+id/followprofs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/followprof"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/postclickable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/profilepic"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@+id/profilepic"
+            android:minHeight="40dp"
+            android:textColor="@color/descriptioncolor"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris iaculis, sem eu egestas commodo, "
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
+
+ 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="7dp" 
+    android:paddingBottom="7dp">
+
+    <ImageButton
+        android:id="@+id/searchdp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/dp" 
+       
+        android:layout_marginLeft="16dp"/>
+
+    <TextView
+        android:id="@+id/usernamesearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="14dp"
+        android:layout_toRightOf="@+id/searchdp"
+        android:layout_marginLeft="10dp"
+        android:text="Madfresco"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ImageButton
+        android:id="@+id/followbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/usernamesearch"
+        android:layout_marginRight="22dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/follow" />
+
+</RelativeLayout>
