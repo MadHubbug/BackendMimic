@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res/com.mimic.accesrest" >
          
          <LinearLayout
              android:id="@+id/follows"
@@ -43,6 +44,7 @@
              </LinearLayout>
              
   		<LinearLayout
+  		    android:id="@+id/followerslayout"
              android:layout_width="match_parent"
              android:layout_height="match_parent" 
              android:gravity="center"
@@ -67,6 +69,7 @@
              </LinearLayout>
 
          <LinearLayout
+             android:id="@+id/followinglayout"
              android:layout_width="match_parent"
              android:layout_height="match_parent" 
              android:gravity="center"
@@ -97,7 +100,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/footerprofpage"
-        android:layout_below="@+id/follows" >
+        android:layout_below="@+id/follows" 
+         android:divider="@drawable/list_divider"
+         android:background="@color/white">
         
     </ListView>
 
@@ -171,15 +176,19 @@
         android:background="@color/white" 
         android:paddingBottom="15dp">
 
-        <ImageView
-            android:id="@+id/profilepic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/dp" />
+            <com.pkmmte.circularimageview.CircularImageView
+        android:id="@+id/profilepic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/dp" 
+        app:civ_border="true"
+        app:civ_border_width="1dp"
+        app:civ_border_color="#6A7172"
+    />
 
         <LinearLayout
             android:id="@+id/linearLayout1"
@@ -214,15 +223,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/profilepic"
+            android:layout_below="@+id/fullname"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp"
             android:layout_toRightOf="@+id/profilepic"
             android:minHeight="40dp"
-            android:textColor="@color/descriptioncolor"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris iaculis, sem eu egestas commodo, "
+            android:text=""
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/descriptioncolor"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/fullname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="130dp"
+            android:layout_marginTop="15dp"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
             android:textSize="16sp" />
 
     </RelativeLayout>

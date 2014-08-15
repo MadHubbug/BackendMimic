@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res/com.mimic.accesrest" 
+    android:background="@color/white">
+
+        <com.pkmmte.circularimageview.CircularImageView
+        android:id="@+id/dppicsettings"
+        android:layout_width="130dp"
+        android:layout_height="110dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/dp" 
+        app:civ_border="true"
+        app:civ_border_width="1dp"
+        app:civ_border_color="#6A7172"
+    />
+    
+    <TextView
+        android:id="@+id/initwelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Full Name"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/descriptioncolor"
+        android:textColorHint="@color/descriptioncolor"
+        android:textSize="16sp" 
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="125dp"/>
+
+    <EditText
+        android:id="@+id/fullnamesettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/initwelcome"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="15dp"
+        android:ems="10"
+        android:maxLines="1" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/fullnamesettings"
+        android:text="Add a Description"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/descriptioncolor"
+        android:textColorHint="@color/descriptioncolor"
+        android:textSize="16sp" 
+        android:layout_marginLeft="20dp"/>
+
+    <EditText
+        android:id="@+id/descriptionsettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/TextView01"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="15dp"
+        android:ems="10"
+        android:maxLines="1" />
+
+    <TextView
+        android:id="@+id/TextView02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/descriptionsettings"
+        android:text="Change your email address"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/descriptioncolor"
+        android:textSize="16sp" 
+        android:layout_marginLeft="20dp"/>
+
+    <EditText
+        android:id="@+id/emailaddsettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/TextView02"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="15dp"
+        android:ems="10"
+        android:maxLines="1" />
+
+</RelativeLayout>

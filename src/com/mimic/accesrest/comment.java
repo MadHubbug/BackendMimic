@@ -22,11 +22,13 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.fedorvlasov.lazylist.ImageLoader;
+
 import com.mimic.accesrest.R.drawable;
+import com.mimic.accesrest.notifications.notificationpost;
 import com.mimic.accesrest.post.MyCounter;
 import com.mimic.accesrest.posting.Createbucket;
 import com.mimic.accesrest.posting.apacheHttpClientPost;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.stream.aws.Response;
 
 
@@ -36,6 +38,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -78,8 +81,9 @@ public class comment extends SherlockActivity {
 	private ImageButton record, delete, play, next;
 	private ExtAudioRecorder mRecorder = null;
 	private boolean plays = true;
+	private boolean owner;
 	private String LOG_TAG = "comment";
-	private String user;
+	private String user, post, users, username, actualusername, owns;
 	private SharedPreferences prefs;  
 	
 	private void onRecord (boolean start){
@@ -107,8 +111,9 @@ public class comment extends SherlockActivity {
 		Bundle bundle = getIntent().getExtras();
 		postid = bundle.getInt("postid");
 		player = new MediaPlayer();
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		comment(postid);
-		imageloader=new ImageLoader(this.getApplicationContext());
+		imageloader = ImageLoader.getInstance();
 		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
 		SpannableString s = new SpannableString("Comment");
 		s.setSpan(new Typefacespan(this, "Roboto-Medium.ttf"), 0, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -118,10 +123,13 @@ public class comment extends SherlockActivity {
 		getSupportActionBar().setIcon(R.drawable.back);
 		ImageView view = (ImageView) findViewById(android.R.id.home);
 		tv = (TextView) findViewById(R.id.countdowncomment);
+		tv.setVisibility(View.GONE);
 		play = (ImageButton) findViewById(R.id.playpostcomment);
 		play.setVisibility(View.GONE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		users = prefs.getString("profileid", "0");
 		user = prefs.getString("profileid", "0");
+		actualusername= prefs.getString("username", "madfresco");
 		clientManager = new AmazonClientManager(getSharedPreferences(
 				"com.mimic.accessrest", Context.MODE_PRIVATE));
 		if (comment.clientManager.hasCredentials()) {
@@ -130,11 +138,16 @@ public class comment extends SherlockActivity {
 			Log.d(LOG_TAG, "no credentials");
 		}
 		next = (ImageButton) findViewById(R.id.nextbuttoncomment);
+		next.setVisibility(View.GONE);
 		next.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
 				new ValidateCredentialsTask().execute();
+				record.setVisibility(View.VISIBLE);
+				next.setVisibility(View.GONE);
+				play.setVisibility(View.GONE);
+				delete.setVisibility(View.GONE);
 				
 			}
 			
@@ -180,7 +193,7 @@ public class comment extends SherlockActivity {
 					tv.setVisibility(View.GONE);
 					delete.setVisibility(View.VISIBLE);
 					record.setVisibility(View.GONE);
-
+					next.setVisibility(View.VISIBLE);
 					play.setVisibility(View.VISIBLE);
 					
 				}
@@ -199,7 +212,8 @@ public class comment extends SherlockActivity {
 				play.setVisibility(View.GONE);
 				record.setImageResource(R.drawable.recwhite);
 				record.setVisibility(View.VISIBLE);
-				
+				next.setVisibility(View.GONE);
+				delete.setVisibility(View.GONE);
 			}
 			
 		});
@@ -277,6 +291,9 @@ public class comment extends SherlockActivity {
 			record.setImageResource(R.drawable.recwhite);
 			tv.setVisibility(View.GONE);
 			delete.setVisibility(View.VISIBLE);
+			record.setVisibility(View.GONE);
+			next.setVisibility(View.VISIBLE);
+			play.setVisibility(View.VISIBLE);	
 			onRecord(false);
 			
 		}
@@ -324,7 +341,7 @@ public class comment extends SherlockActivity {
 		  public MimicData play;
 		  public ImageButton commentplays;
 		  public commentdata comments;
-		  public String commenturl, posturl;
+		  public String commenturl, posturl, profileurl;
 		public ImageView dp;
 		public TextView user, times;
 
@@ -336,9 +353,10 @@ public class comment extends SherlockActivity {
 		final MimicData x = mimicdatas.get(0);
 		String na = x.geturl();
 		ImageView dp = (ImageView) findViewById(R.id.commentpagedisplaypic);
-		imageloader.DisplayImage(na, dp, 100);
+		imageloader.displayImage(na, dp);
 		TextView user = (TextView) findViewById(R.id.commentpageusername);
 		user.setText(x.getUsername());
+		username = x.getUsername();
 		TextView description = (TextView) findViewById(R.id.commentpagedescription);
 		description.setText(x.getsharecount());
 		final TextView like = (TextView) findViewById(R.id.commentpagelikecount);
@@ -348,8 +366,14 @@ public class comment extends SherlockActivity {
 		final ImageButton s = (ImageButton) findViewById(R.id.commentpagelike);
 		TextView timestamp = (TextView) findViewById(R.id.commentpagetimestamp);
 		timestamp.setText(x.gettime());
-		
+		owner = x.getowner();
+		if (owner == true){
+			owns = "true";
+		}else if (owner == false){
+			owns = "false";
+		}
 		final boolean w = x.getLikes();
+		Log.d("liked?!", x.getLikes() + " ");
 		if (w==true){
 			s.setImageResource(R.drawable.liked);
 		}else{
@@ -372,7 +396,7 @@ public class comment extends SherlockActivity {
 				}else{
 					s.setImageResource(R.drawable.liked);
 					String m = Integer.toString(postid);
-					likes.execute(m);
+					likes.execute(m, users, username, actualusername, owns);
 					int a = x.getlikecounter();
 					a += 1;
 					like.setText(Integer.toString(a));
@@ -508,7 +532,7 @@ public class comment extends SherlockActivity {
 		protected String doInBackground(Response... responses) {
 
 			Response response = responses[0];
-			if (response != null && response.requestWasSuccessful()) {
+			if (response != null && response.requestWasSuccessful()) {	
 				Log.d(LOG_TAG, "Validated");
 				TransferManager manager = new TransferManager(clientManager.s3());
 				Log.d(LOG_TAG, "creating file");
@@ -606,11 +630,11 @@ public class comment extends SherlockActivity {
 		return result.toString();
 
 	}
-	public class apacheHttpClientPost extends AsyncTask<String,String,Void> {
+	public class apacheHttpClientPost extends AsyncTask<String,String,Response> {
 		@Override
-		protected Void doInBackground(String... params) {
+		protected Response doInBackground(String... params) {
 			// TODO Auto-generated method stub
-			String post = Integer.toString(postid);
+			post = Integer.toString(postid);
 			
 		
 		
@@ -648,6 +672,15 @@ public class comment extends SherlockActivity {
 
 			}
 			return null;
+
+		}
+		
+		@Override
+		protected void onPostExecute(Response response) {
+			notificationpost notif= new notificationpost();
+			notif.execute(post, user, "comments", username, actualusername, owns);
+
+			
 
 		}
 

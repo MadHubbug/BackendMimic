@@ -3,14 +3,23 @@ package com.mimic.accesrest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 
 
 
 
 
-import com.fedorvlasov.lazylist.ImageLoader;
+
+import com.facebook.UiLifecycleHelper;
+import com.facebook.widget.FacebookDialog;
 import com.mimic.accesrest.MainActivity.MyViewHolder;
+
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.pkmmte.circularimageview.CircularImageView;
 
 
 
@@ -29,6 +38,11 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextPaint;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,7 +71,7 @@ public class MimicAdapter extends BaseAdapter {
 	private ImageView dp;
 	public ImageLoader imageloader;
 	//public SeekBar seekbar;
-	private MediaPlayer player = new MediaPlayer();
+	public MediaPlayer player;
 	private final boolean[] mHighlightedPositions = new boolean[50];
 	private final boolean[] likedpositions = new boolean[50];
 	private final int[] likenumpos = new int[50];
@@ -68,22 +82,40 @@ public class MimicAdapter extends BaseAdapter {
 	public ViewGroup parents;
 	public Handler mHandler = new Handler();
 	//private PlaybackUpdater mProgressUpdater = new PlaybackUpdater();
-	private boolean checker = true;
+	public boolean checker = true;
 	public Typeface type;
 	private RelativeLayout s;
-	private String user;
-	
+	private String user, share, actualusername, owns;
+	private MainActivity main;
+	private int Color;
+	public UiLifecycleHelper uiHelper;
+	private DisplayImageOptions options;
 	public MimicAdapter(Activity a, LayoutInflater l, ArrayList <MimicData> m){
 		
 		this.activity = a;
 		this.layoutinflater = l;
 		this.mimicdata = m;
-		imageloader=new ImageLoader(activity.getApplicationContext());
+		Color = a.getResources().getColor(R.color.facebookblue);
+		
+		imageloader = ImageLoader.getInstance();
 		type = Typeface.createFromAsset(a.getAssets(), "fonts/Roboto-Regular.ttf");
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("profileid", "0");
+		actualusername = prefs.getString("username", "madfresco");
+		options = new DisplayImageOptions.Builder()
+		.showImageOnLoading(R.drawable.biggerplay)
+		.showImageForEmptyUri(R.drawable.biggerplay)
+		.showImageOnFail(R.drawable.biggerplay)
+		.cacheInMemory(true)
+		.cacheOnDisk(true)
+		.considerExifParams(true)
+		.build();
 
- 
+		
+	}
+	
+	public MediaPlayer getPlayer(){
+		return player;
 	}
 		
 	@Override
@@ -112,7 +144,23 @@ public class MimicAdapter extends BaseAdapter {
 		if (ConvertView == null){
 			ConvertView = layoutinflater.inflate(R.layout.rows, parent, false);
 			holder = new MyViewHolder();
+			
 			holder.user = (TextView) ConvertView.findViewById(R.id.username);
+			holder.user.setTypeface(type);
+			
+			holder.user.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View arg0) {
+					Log.d("whats in this", "what: "+ holder.profileurl);
+					Intent x = new Intent(activity, profile.class);
+					x.putExtra("profileurl", holder.profileurl);
+					x.putExtra("prof", true);
+					activity.startActivity(x);
+					
+				}
+				
+			});
 			holder.description = (TextView) ConvertView.findViewById(R.id.description);
 			holder.likesnum= (TextView) ConvertView.findViewById(R.id.likecount);
 			holder.commentnum= (TextView) ConvertView.findViewById(R.id.replycount);
@@ -120,10 +168,10 @@ public class MimicAdapter extends BaseAdapter {
 			holder.timestamp = (TextView) ConvertView.findViewById(R.id.timestamp);
 			holder.like.setFocusable(false);
 			holder.like.setOnClickListener(new OnClickListener(){
-
 				@Override
 				
 					public void onClick(View v) {
+
 						final liking likes = new liking();
 						final dislike dislike = new dislike();	
 						int y = holder.postid;
@@ -141,7 +189,8 @@ public class MimicAdapter extends BaseAdapter {
 							holder.likesnum.setText(Integer.toString(likenumpos[a]));
 						}else if (likedpositions[a] == false){
 						
-							likes.execute(x, user);
+							likes.execute(x, user, holder.username, actualusername, owns);
+							
 							Log.d("what is x", x);
 							mimic.setLikes(true);
 							likedpositions[a] = true;
@@ -167,7 +216,8 @@ public class MimicAdapter extends BaseAdapter {
 			
 			
 			
-			holder.dp = (ImageView) ConvertView.findViewById(R.id.displaypic);
+			holder.dp = (CircularImageView) ConvertView.findViewById(R.id.displaypic);
+			
 			holder.dp.setOnClickListener(new OnClickListener(){
 
 				@Override
@@ -283,7 +333,24 @@ public class MimicAdapter extends BaseAdapter {
 				
 				@Override
 				public void onClick(View arg0) {
-					Log.d("clcked", "share");
+					if (FacebookDialog.canPresentShareDialog(activity.getApplicationContext(), 
+                            FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
+					// Publish the post using the Share Dialog
+					FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(activity)
+					.setLink("https://fb.com/mimictheapp")
+					.setDescription("Shared this mimic called "+holder.sharetitle+". Sign up for beta and download the app!"	)
+					
+					.build();
+					if (uiHelper == null){
+						Log.d("why", "idk");
+					}
+					uiHelper.trackPendingDialogCall(shareDialog.present());
+					
+					} else {
+					// Fallback. For example, publish the post using the Feed Dialog
+					}
+					
+					
 					
 				}
 			});
@@ -323,31 +390,51 @@ public class MimicAdapter extends BaseAdapter {
 		}else{
 			holder = (MyViewHolder)ConvertView.getTag();
 		}
-		
-		
-		
+	   	if (player == null){
+    		player = new MediaPlayer();
+    	}
+
 		mimic = mimicdata.get(pos);
 		holder.mimic = mimic;
 		String y = mimic.getUsername();
 		holder.user.setText(y.substring(0,1).toUpperCase()+y.substring(1));
 		holder.user.setTypeface(type);
+		holder.username = mimic.getUsername();
 		holder.description.setTypeface(type);
 		holder.description.setText(mimic.getsharecount());
 		holder.likecount = mimic.getlikecounter();
-		
+		holder.sharetitle = mimic.getsharecount();
 		holder.commentnum.setText(mimic.getcommentcounter());
 		holder.commentnum.setTypeface(type);
 		holder.timestamp.setText(mimic.gettime());
 		holder.postid = mimic.getpostid();
 		holder.profileurl= mimic.getprofileurl();
+		holder.own = mimic.getowner();
+		if (holder.own == true){
+			owns = "true";
+		}else if (holder.own == false){
+			owns = "false";
+		}
+		Log.d("What is parent", parent.getParent() + " ");
 		//getuserPic x = new getuserPic();
 		//x.execute("http://graph.facebook.com/snucks/picture?type=large");
 		holder.posturl = mimic.getposturl();
 		holder.play.setTag(pos);
 		//holder.sb.setTag(pos);
 		holder.like.setTag(pos);
+		Pattern tagMatcher = Pattern.compile("#([ء-يA-Za-z0-9_-]+)");
+		String newActivityURL = "content://com.mimic.accesrest.hash/";
+		Linkify.addLinks(holder.description, tagMatcher, newActivityURL);
+		Pattern tagMatch = Pattern.compile("[@]+[A-Za-z0-9-_]+\\b");
+		String newActivity = "mimic://com.mimic.accesrest.profile/";
+		Linkify.addLinks(holder.description,tagMatch, newActivity);
+		stripUnderlines(holder.description);
+		
+		
+		
 		String na = mimic.geturl();
-		imageloader.DisplayImage(na, holder.dp, 100);
+		
+		imageloader.displayImage(na, holder.dp, options);
 		if (checker == true){
 			for (int i=0; i<mimicdata.size(); i++)				
 			{
@@ -391,7 +478,7 @@ public class MimicAdapter extends BaseAdapter {
         // TODO Auto-generated method stub
 		final int k = tag;
         try {
-        	
+     
             player.reset();
             player.setDataSource(url);
             // mPlayer.setDataSource(mFileName);
@@ -406,9 +493,7 @@ public class MimicAdapter extends BaseAdapter {
 
 						@Override
 						public void onCompletion(MediaPlayer arg0) {
-							ListView lr = (ListView) s.getParent();
-							RelativeLayout m = (RelativeLayout) lr.getChildAt(k);
-							ImageButton r = (ImageButton) m.getChildAt(12);
+							ImageButton r = (ImageButton)s.getChildAt(12);
 					    	r.setImageResource(R.drawable.playbutton);
 					    	mHighlightedPositions[k] = false;
 							
@@ -430,7 +515,27 @@ public class MimicAdapter extends BaseAdapter {
         }
 
     }
-	
+	   private void stripUnderlines(TextView textView) {
+	        Spannable s = new SpannableString(textView.getText());
+	        URLSpan[] spans = s.getSpans(0, s.length(), URLSpan.class);
+	        for (URLSpan span: spans) {
+	            int start = s.getSpanStart(span);
+	            int end = s.getSpanEnd(span);
+	            s.removeSpan(span);
+	            span = new URLSpanNoUnderline(span.getURL());
+	            s.setSpan(span, start, end, 0);
+	        }
+	        textView.setText(s);
+	    }
+	   private class URLSpanNoUnderline extends URLSpan {
+	        public URLSpanNoUnderline(String url) {
+	            super(url);
+	        }
+	        @Override public void updateDrawState(TextPaint ds) {
+	            super.updateDrawState(ds);
+	            ds.setUnderlineText(false);
+	        }
+	    }
 	private void stopPlayback()
     {
         mPlayingPosition = not_playing;;

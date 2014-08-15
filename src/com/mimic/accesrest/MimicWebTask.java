@@ -76,9 +76,10 @@ public class MimicWebTask extends AsyncTask<Integer, Integer, String>{
 				String url= post.getString("url");
 				String posturl = post.getString("posturls");
 				String description = post.getString("description");
+				boolean owner = post.getBoolean("own");
 //				description = "Woah, nice app. I'm really liking this. Really cool!";
 				if (description == "null"){
-					description = " ";
+					description = "";
 				}
 				int comments = post.getInt("commentscount");
 				int likes= post.getInt("likescount");
@@ -88,9 +89,9 @@ public class MimicWebTask extends AsyncTask<Integer, Integer, String>{
 				
 				if (next == "null"){
 					Log.d("ending", "end is here");
-					mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, false));
+					mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, false, owner));
 				}else{
-				mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, true));
+				mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, true, owner));
 				}
 			}
 			
@@ -100,6 +101,8 @@ public class MimicWebTask extends AsyncTask<Integer, Integer, String>{
 			}
 		
 		this.activity.setUsers(mimicdata);
+		this.activity.mPullToRefreshLayout.setRefreshComplete();
+		this.activity.prog.dismiss();
 		}
 		
 		

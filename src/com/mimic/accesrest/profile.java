@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
@@ -20,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +31,10 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
-import com.fedorvlasov.lazylist.ImageLoader;
+import com.mimic.accesrest.notifications.Notifications;
+//import com.fedorvlasov.lazylist.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.pkmmte.circularimageview.CircularImageView;
 
 public class profile extends SherlockActivity implements OnClickListener{
 
@@ -39,54 +45,50 @@ public class profile extends SherlockActivity implements OnClickListener{
 	private TextView fullnameprof;
 	private TextView Usernameprof;
 	private TextView followers;
-	private TextView followings;
+	private TextView followings, description;
 	private Typeface type;
 	public ImageLoader imageloader;
-	private ImageView display;
+	private CircularImageView display;
 	private TextView mimicscount;
-	private boolean follows;
-	private ImageButton follow;
+	private boolean follows, y;
+	private ImageButton follow,btn, profbutton;
 	private static final String logtaskact = "MainUI";
-	private String postid, user;
+	private String postid, user, actualuser, username, x;
+	private Bundle bundle;
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.profile);
+		imageloader = ImageLoader.getInstance();
 		this.layoutinflater = LayoutInflater.from(this);
-		Bundle bundle = getIntent().getExtras();
-		String x = bundle.getString("profileurl");
-		Boolean y = bundle.getBoolean("prof");
-		ImageButton profile = (ImageButton) findViewById(R.id.profilebuttonprofpage);
-		profile.setOnClickListener(this);
-		TextView Usernameprof = (TextView) findViewById(R.id.postclickable);
+		 Uri uri = getIntent().getData();
+		 if (uri != null){
+		 String tag = uri.toString().split("/")[3];
+		 x = tag.substring(1);
+		 } 
+		 else{
+			 bundle = getIntent().getExtras();
+				 x = bundle.getString("profileurl");
+				Log.d("profileurl", x);	
+				y = bundle.getBoolean("prof");
+			 }
+	
+		profbutton = (ImageButton) findViewById(R.id.profilebuttonprofpage);
+		profbutton.setOnClickListener(this);
+		description = (TextView) findViewById(R.id.postclickable);
 		type = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Regular.ttf");
-		ImageButton btn = (ImageButton) findViewById(R.id.editprof);
-		Usernameprof.setTypeface(type);
+		btn = (ImageButton) findViewById(R.id.editprof);
+		description.setTypeface(type);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		user = prefs.getString("profileid", "0");
+		actualuser = prefs.getString("username", "madfresco");
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		follow = (ImageButton) findViewById(R.id.followprofs);
-		
-		if (y==false){
-			Log.d("y", "y is null"+ y);
-			getSupportActionBar().setDisplayShowHomeEnabled(false);
+		fullnameprof = (TextView) findViewById(R.id.fullname);
+		fullnameprof.setTypeface(type);
 
-
-			
-		}else{
-			
-			getSupportActionBar().setDisplayShowHomeEnabled(true);
-			getSupportActionBar().setHomeButtonEnabled(true);
-			getSupportActionBar().setIcon(R.drawable.back);
-			profile.setImageResource(R.drawable.profilebuttonunclicked);
-			btn.setVisibility(View.GONE);
-			LinearLayout ll = (LinearLayout) follow.getParent();
-			int color = getResources().getColor(R.color.dividercolor);
-			ll.setBackgroundColor(color);
-			follow.setVisibility(View.VISIBLE);
-			
-		}
 		follow.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -100,7 +102,7 @@ public class profile extends SherlockActivity implements OnClickListener{
 					follow.setImageResource(R.drawable.followprof);			
 				}else if (follows== false){
 					
-					tofollow.execute(postid, user);
+					tofollow.execute(postid, user,username, actualuser);
 					follows = true;
 					follow.setImageResource(R.drawable.followingprof);
 				}
@@ -123,10 +125,51 @@ public class profile extends SherlockActivity implements OnClickListener{
 		explore.setOnClickListener((OnClickListener) this);
 		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		display = (ImageView) findViewById(R.id.profilepic);
+		display = (CircularImageView) findViewById(R.id.profilepic);
 		mimicscount = (TextView) findViewById(R.id.postcounts);
 		
+		LinearLayout following = (LinearLayout) findViewById(R.id.followinglayout);
+		following.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				Intent x = new Intent(profile.this, followinglist.class);
+				x.putExtra("label", "Follower");
+				x.putExtra("postids", postid);
+				startActivity(x);
+				
+				
+			}
+		});
 		
+		
+		
+		btn.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				startActivity(new Intent(profile.this, settings.class));
+			}
+			
+			
+			
+		});
+		
+		LinearLayout follower = (LinearLayout) findViewById(R.id.followerslayout);
+		
+		follower.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				Intent x = new Intent(profile.this, followinglist.class);
+				x.putExtra("label", "Following");
+				x.putExtra("postids", postid);
+				startActivity(x);
+				
+				
+			}
+		});
 		mimic(x);
 		
 	}
@@ -146,16 +189,20 @@ public class profile extends SherlockActivity implements OnClickListener{
 	
 	}else if(v.getId() == R.id.homebuttonprofpage){
 		startActivity(new Intent(profile.this, MainActivity.class));
+		this.finish();
 	}
 	else if(v.getId() == R.id.notificationbuttonprofpage){
 		Intent x = new Intent(profile.this, Notifications.class);
 		startActivity(x);
+		this.finish();
 	} else if (v.getId()== R.id.profilebuttonprofpage){
 		Intent x = new Intent(profile.this, profile.class);
 		x.putExtra("profileurl", "http://mimictheapp.herokuapp.com/profiles/");
 		startActivity(x);
+		this.finish();
 	}else if (v.getId()==R.id.explorebuttonprofpage){
 		startActivity(new Intent(profile.this, Explore.class));
+		this.finish();
 	}
 }
 
@@ -171,8 +218,13 @@ public class profile extends SherlockActivity implements OnClickListener{
     }
 	
 	public void mimic(String x){
+		String query;
 		profilewebtask proftask = new profilewebtask(profile.this);
-		String query = x+"?format=json";
+		if (x.length()<20){
+			query = "http://mimictheapp.herokuapp.com/profilesearch/?search="+x+"&format=json";
+		}
+		else{ query = x+"?format=json";
+		}
 		
 		try{
 			proftask.execute(query);
@@ -196,29 +248,55 @@ public class profile extends SherlockActivity implements OnClickListener{
 
 	public void setUsers(ArrayList<profiledata> profiledata) {
 		this.profiledatas = profiledata;
+		int q = profiledatas.size();
+		if (q>0){
 		profiledata x = profiledatas.get(0);
-		imageloader=new ImageLoader(this);
-		imageloader.DisplayImage(x.getprofileurl(), display, 200);
+//		imageloader=new ImageLoader(this);
+		username = x.getUsername();
+		imageloader.displayImage(x.getprofileurl(), display);
 		SpannableString s = new SpannableString(x.getUsername().toUpperCase());
 		s.setSpan(new Typefacespan(this, "Roboto-Medium.ttf"), 0, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		getSupportActionBar().setTitle(s);
 		getSupportActionBar().setDisplayShowTitleEnabled(true);
-
+		description.setText(x.getdescription());
 		mimicscount.setText(x.getpostcount());
 		followers.setText(x.getfollowers());
 		followings.setText(x.getfollowing());
 		follows = x.getfollows();
+		fullnameprof.setText(x.getfullname());
 		if (follows == true){
 			follow.setImageResource(R.drawable.followingprof);
 		}
 		postid = x.getpostid();
+		boolean own = x.getowner();
+		if (own == true){
+		btn.setVisibility(View.VISIBLE);
+		follow.setVisibility(View.GONE);
+		}else{
+			getSupportActionBar().setDisplayShowHomeEnabled(true);
+			getSupportActionBar().setHomeButtonEnabled(true);
+			getSupportActionBar().setIcon(R.drawable.back);
 
+			profbutton.setImageResource(R.drawable.profilebuttonunclicked);
+			btn.setVisibility(View.GONE);
+			LinearLayout ll = (LinearLayout) follow.getParent();
+			int color = getResources().getColor(R.color.dividercolor);
+			ll.setBackgroundColor(color);
+			follow.setVisibility(View.VISIBLE);
+		}
+			
+		}
 		
 	}
 	  public static class MyViewHolder {
-	        public TextView  title, sharenum, commentnum, likesnum, timestamp;
-	        public MimicData mimic;
-	        public String posturl, postid;
-	        public ImageButton plays;
+		     public TextView user, description, echonum, commentnum, likesnum, duration, timestamp;
+		        public MimicData mimic;
+		        public ImageButton like, play, share, reply, echo;
+		        public String posturl, profileurl, username;
+		        public SeekBar sb;
+		        public ImageView dp;
+		        public int postid, likecount;
+		        public Boolean liked, own;
+
 	    }
 }

@@ -6,13 +6,21 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,25 +34,33 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.MultiAutoCompleteTextView;
+import android.widget.MultiAutoCompleteTextView.Tokenizer;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+//import com.amazonaws.org.apache.http.util.EntityUtils;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
+import com.parse.ParsePush;
 import com.stream.aws.Response;
 
 
@@ -57,13 +73,18 @@ public class posting extends SherlockActivity implements OnClickListener{
 	public static String bucketname = "mimic";
 	private static URL newurl = null;
 	public static String gg = null;
-	private static EditText et = null;
+//	private static EditText et = null;
 	private static String Title = null;
 	private ImageButton play;
 	private boolean mStartPlaying = true;
-	private String user;
+	private String user, username, id;
 	private SharedPreferences prefs;
-
+	private MultiAutoCompleteTextView autoComplete;
+	private JSONObject data;
+	private ArrayList<dropdowndata> dropdowndata;
+	private ArrayList<String> usernames;
+	private int page = 1;
+	private dropdownwebtask task;
 	
     private void onPlay(boolean start){
 		if(start){
@@ -134,11 +155,12 @@ public class posting extends SherlockActivity implements OnClickListener{
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setIcon(R.drawable.back);
-
+		username = prefs.getString("username", "madfresco");
 		user = prefs.getString("profileid", "0");
 		ImageView view = (ImageView) findViewById(android.R.id.home);
 		final ImageButton tw = (ImageButton) findViewById(R.id.twittershare);
-	
+		usernames = new ArrayList<String>();
+		mimic(page);
 		
 		tw.setOnClickListener(new OnClickListener(){
 			boolean l = true;
@@ -172,8 +194,65 @@ public class posting extends SherlockActivity implements OnClickListener{
 		});
 	
 		play =(ImageButton) findViewById(R.id.play);
-		et = (EditText) findViewById(R.id.description);
-		
+		autoComplete = (MultiAutoCompleteTextView)findViewById(R.id.description);
+
+		//Create a new Tokenizer which will get text after '@' and terminate on ' '
+		        autoComplete.setTokenizer(new Tokenizer() {
+
+		          @Override
+		          public CharSequence terminateToken(CharSequence text) {
+		            int i = text.length();
+
+		            while (i > 0 && text.charAt(i - 1) == ' ') {
+		              i--;
+		            }
+
+		            if (i > 0 && text.charAt(i - 1) == ' ') {
+		              return text;
+		            } else {
+		              if (text instanceof Spanned) {
+		                SpannableString sp = new SpannableString(text + " ");
+		                TextUtils.copySpansFrom((Spanned) text, 0, text.length(), Object.class, sp, 0);
+		                return sp;
+		              } else {
+		                return text + " ";
+		              }
+		            }
+		          }
+
+		          @Override
+		          public int findTokenStart(CharSequence text, int cursor) {
+		            int i = cursor;
+
+		            while (i > 0 && text.charAt(i - 1) != '@') {
+		              i--;
+		            }
+
+		            //Check if token really started with @, else we don't have a valid token
+		            if (i < 1 || text.charAt(i - 1) != '@') {
+		              return cursor;
+		            }
+
+		            return i;
+		          }
+
+		          @Override
+		          public int findTokenEnd(CharSequence text, int cursor) {
+		            int i = cursor;
+		            int len = text.length();
+
+		            while (i < len) {
+		              if (text.charAt(i) == ' ') {
+		                return i;
+		              } else {
+		                i++;
+		              }
+		            }
+
+		            return len;
+		          }
+		        });
+		     
 		clientManager = new AmazonClientManager(getSharedPreferences(
 				"com.mimic.accessrest", Context.MODE_PRIVATE));
 		if (posting.clientManager.hasCredentials()) {
@@ -188,9 +267,9 @@ public class posting extends SherlockActivity implements OnClickListener{
 			public void onClick(View v) {
 				onPlay(x);
 				if (x){
-					play.setImageResource(R.drawable.biggerstop);
+					play.setImageResource(R.drawable.stopbutton);
 				} else{
-					play.setImageResource(R.drawable.biggerplay);
+					play.setImageResource(R.drawable.playbutton);
 				}
 				mStartPlaying = !mStartPlaying;
 				
@@ -211,11 +290,15 @@ public class posting extends SherlockActivity implements OnClickListener{
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	   // Handle item selection
+
 	   switch (item.getItemId()) {
 	      case R.id.contin:
-	    	  Title = et.getText().toString();
+	    	  Title = autoComplete.getText().toString();
+	    	 
+
+	    	  
 	    	  new ValidateCredentialsTask().execute();
-	    	  ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(et.getWindowToken(), 0);
+	    	  ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(autoComplete.getWindowToken(), 0);
 	      	
 	        case android.R.id.home:
 	            Log.d("did you", "click?");
@@ -389,8 +472,17 @@ public class posting extends SherlockActivity implements OnClickListener{
 				postRequest.setEntity(entity);	
 				postRequest.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
 				Log.d(LOG_TAG, "noresponse");  
-				httpClient.execute(postRequest);
-				Log.d(LOG_TAG, "noresponse");  
+				HttpResponse response =  (HttpResponse) httpClient.execute(postRequest);
+				String t = EntityUtils.toString(response.getEntity());
+				try {
+					JSONObject obj = new JSONObject(t);
+					id = obj.getString("id");
+					Log.d("postid", id+" ");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				Log.d(LOG_TAG, t);  
 
 				System.out.println("Output from Server .... \n");
 
@@ -408,8 +500,90 @@ public class posting extends SherlockActivity implements OnClickListener{
 			return null;
 
 		}
+		
+		@Override
+		protected void onPostExecute(Void params){
+			boolean check=false;
+			
+			try{
+				 Pattern tagMatcher = Pattern.compile("@([ء-يA-Za-z0-9_-]+)");
+		    	  Matcher m = tagMatcher.matcher(Title);
+		    	  
+		    	  LinkedList<String> channels = new LinkedList<String>();
+		    	  Log.d("title", Title);
+//		    	  Boolean x = m.find();
+		    	  while (m.find()) { // Find each match in turn; String can't do this.
+		    		  String name = m.group(0);
+		    		  String s = "user"+name.substring(1);
+		    		  Log.d("channels", name);
+		    		  Log.d("channels", s);
+		    		  channels.add(s);
+		    		  posttaggingnotif tag = new posttaggingnotif();
+		    		  tag.execute(id, user, name.substring(1));
+		    		  check=true;
+		    		  // Access a submatch group; String can't do this.
+		    	  }
+		    	  if (check){
+			    		ParsePush push = new ParsePush();
+			    		push.setChannels(channels);
+			    		try {
+							data = new JSONObject("{\"action\": \"com.mimic.accesrest.UPDATE_STATUS\", \"name\": \"Notification\", \"msg\": \""+username+" tagged you in a post\"}");
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+			    		push.setData(data);
+			    		push.sendInBackground();
+		    	  }else{Log.d("no one was tagged", "NO ONE WAS tAGGED");}
+
+
+			}catch (Exception exception){
+
+			}
+
+		}
+
+		
 
 	}
+	
+	
+		public void mimic(int page){
+			String x = String.valueOf(page);
+			try{
+				task = new dropdownwebtask(posting.this);
+				task.execute(x);
+				} catch (Exception e){
+					task.cancel(true);
+					
+				}
+			
+		}
+	
+	public void setUsers(ArrayList<dropdowndata> dropdowndata) {
+		
+		this.dropdowndata = dropdowndata;
+		int q = dropdowndata.size();
+		if (q > 0){
+			for (int i = 0; i<q; i++){
+			usernames.add(dropdowndata.get(i).getusername());
+			}
+			if (dropdowndata.get(0).getnext().equals("null")){
+				Log.d("no more next page", "no ore");
+				 ArrayAdapter<String> adapt = new ArrayAdapter<String>(this, R.layout.dropdown, R.id.item, usernames);       
+				 autoComplete.setAdapter(adapt);
+			}else {
+				page +=1;
+				
+			mimic(page);
+			}
+		}else {
+			Log.d("no followers", "no followers");
+		}
+		
+		
+	}
+
 	
 	
 	

@@ -215,6 +215,7 @@ public class ExtAudioRecorder
 			{ // RECORDING_COMPRESSED
 				mediaRecorder = new MediaRecorder();
 				mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+				Log.d("AM I EVEN HERE?!", "here");
 				mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 				mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);				
 			}
@@ -448,13 +449,14 @@ public class ExtAudioRecorder
 					mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 					mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 					mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+					
 				}
 				state = State.INITIALIZING;
 			}
 		}
 		catch (Exception e)
 		{
-			Log.e(ExtAudioRecorder.class.getName(), e.getMessage());
+			Log.d(ExtAudioRecorder.class.getName(), e.getMessage());
 			state = State.ERROR;
 		}
 	}

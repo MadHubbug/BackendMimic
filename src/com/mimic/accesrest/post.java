@@ -45,7 +45,7 @@ public class post extends SherlockActivity {
 	
 	private MediaPlayer mPlayer = new MediaPlayer();
 	private TextView tv;
-	private ImageButton record, delete, play;
+	private ImageButton record, delete, play, next;
 	private static final String Logs = "postui";
 	private RelativeLayout rel;
 	
@@ -123,7 +123,7 @@ public class post extends SherlockActivity {
 		setContentView(R.layout.recording);
 	   	tv = (TextView) findViewById(R.id.countdowncomment);
 	   	tv.setVisibility(View.GONE);
-	   	final ImageButton next = (ImageButton) findViewById(R.id.nextbuttoncomment);
+	   	next = (ImageButton) findViewById(R.id.nextbuttoncomment);
 		play = (ImageButton) findViewById(R.id.playpostcomment);
 		play.setVisibility(View.GONE);
 		play.setOnClickListener(new OnClickListener() {
@@ -139,6 +139,7 @@ public class post extends SherlockActivity {
 				} plays = !plays;
 			}
 		});
+		next.setVisibility(View.GONE);
 		next.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -166,7 +167,9 @@ public class post extends SherlockActivity {
 				play.setVisibility(View.GONE);
 				record.setImageResource(R.drawable.recwhite);
 				record.setVisibility(View.VISIBLE);
-				
+				next.setVisibility(View.GONE);
+				delete.setVisibility(View.GONE);
+				mPlayer.stop();
 			}
 			
 		});
@@ -188,7 +191,7 @@ public class post extends SherlockActivity {
 					tv.setVisibility(View.GONE);
 					delete.setVisibility(View.VISIBLE);
 					record.setVisibility(View.GONE);
-
+					next.setVisibility(View.VISIBLE);
 					play.setVisibility(View.VISIBLE);
 					
 				}
@@ -234,6 +237,9 @@ public class post extends SherlockActivity {
 				record.setImageResource(R.drawable.recwhite);
 				tv.setVisibility(View.GONE);
 				delete.setVisibility(View.VISIBLE);
+				record.setVisibility(View.GONE);
+				next.setVisibility(View.VISIBLE);
+				play.setVisibility(View.VISIBLE);
 				onRecord(false);
 				
 			}

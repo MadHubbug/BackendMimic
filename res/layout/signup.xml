@@ -3,16 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+    android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+    xmlns:app="http://schemas.android.com/apk/res/com.mimic.accesrest" >
 
-    <ImageView
+    <com.pkmmte.circularimageview.CircularImageView
         android:id="@+id/dppic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="130dp"
+        android:layout_height="110dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/dp" />
+        android:layout_marginTop="8dp"
+        android:src="@drawable/dp" 
+        app:civ_border="true"
+        app:civ_border_width="1dp"
+        app:civ_border_color="#6A7172"
+    />
 
     <Button
         android:id="@+id/Signup"
@@ -51,7 +56,8 @@
         android:layout_marginRight="30dp"
         android:layout_marginLeft="16dp"
         android:layout_below="@+id/commentpageduration"
-        android:ems="10" >
+        android:ems="10"
+        android:maxLines="1" >
 
         <requestFocus />
     </EditText>

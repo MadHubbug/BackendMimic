@@ -2,15 +2,15 @@ package com.mimic.accesrest;
 
 public class profiledata{
 	
-	private String fullname, postid;
+	private String fullname, postid, description;
 	private String username;
 	private Integer followers;
 	private Integer following, postcount;
 	private String profileurl;
-	private boolean follows;
+	private boolean follows, owner;
 	
 	public profiledata(String full, String Username, Integer Followers, 
-			Integer Following, String profileurl, Integer postcount, boolean follows, String postid){
+			Integer Following, String profileurl, Integer postcount, boolean follows, String postid, String description, boolean owner){
 		this.profileurl = profileurl;
 		this.fullname = full;
 		this.username = Username;
@@ -19,9 +19,17 @@ public class profiledata{
 		this.postcount = postcount;
 		this.follows = follows;
 		this.postid = postid;
+		this.description = description;
+		this.owner = owner;
 				
 	}
 	
+	public boolean getowner(){
+		return owner;
+	}
+	public String getdescription(){
+		return description;
+	}
 	public String getpostid(){
 		return postid;
 	}

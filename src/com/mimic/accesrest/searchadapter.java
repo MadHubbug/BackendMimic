@@ -2,9 +2,10 @@ package com.mimic.accesrest;
 
 import java.util.ArrayList;
 
-import com.fedorvlasov.lazylist.ImageLoader;
+//import com.fedorvlasov.lazylist.ImageLoader;
 import com.mimic.accesrest.MainActivity.MyViewHolder;
 import com.mimic.accesrest.search.MyHolder;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class searchadapter extends BaseAdapter{
@@ -27,16 +29,16 @@ public class searchadapter extends BaseAdapter{
 	private ImageLoader imageloader;
 	private boolean checker = true;
 	private boolean[] followedpositions = new boolean[50];
-	private String profileurl, user;
+	private String profileurl, user, actualuser, username;
 public searchadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 		
 		this.activity = a;
 		this.layoutinflater = l;
 		this.mimicdata = m;
-		imageloader=new ImageLoader(activity.getApplicationContext());
+		imageloader = ImageLoader.getInstance();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("profileid", "0");
-		
+		actualuser = prefs.getString("username", "0");
 		
 	}
 
@@ -62,7 +64,7 @@ public searchadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 		if (ConvertView == null){
 			ConvertView = layoutinflater.inflate(R.layout.searchusers, parent, false);
 			holder = new MyHolder();
-			holder.dp = (ImageButton) ConvertView.findViewById(R.id.searchdp);
+			holder.dp = (ImageView) ConvertView.findViewById(R.id.searchdp);
 			holder.username =(TextView) ConvertView.findViewById(R.id.usernamesearch);
 			holder.follow = (ImageButton) ConvertView.findViewById(R.id.followbutton);
 			holder.follow.setOnClickListener(new OnClickListener(){
@@ -85,7 +87,7 @@ public searchadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 					}else if (followedpositions[a] == false){
 						Log.d("What is holder?", "Holder: "+ y);
 						Log.d("What is holder?", "Holder: "+ a);
-						follow.execute(x, user);
+						follow.execute(x, user,holder.usern, actualuser);
 						Log.d("what is x", x);
 						followedpositions[a] = true;
 						//notifyDataSetChanged();
@@ -126,14 +128,17 @@ public searchadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 		holder = (MyHolder)ConvertView.getTag();
 	}
 		
+		
 		String x= mimicdata.get(pos).getusername();
 		holder.searchdata = mimicdata.get(pos);
 		holder.username.setText(mimicdata.get(pos).getusername());
+		holder.usern = mimicdata.get(pos).getusername();
+		holder.username.setTextColor(activity.getResources().getColor(R.color.descriptioncolor));
 		holder.profileurl= mimicdata.get(pos).getprofileurl();
 		holder.follow.setTag(pos);
 		holder.profileid = mimicdata.get(pos).getid();
 		profileurl = holder.profileurl;
-		imageloader.DisplayImage(mimicdata.get(pos).getprofilepictureurl(), holder.dp, 100);
+		imageloader.displayImage(mimicdata.get(pos).getprofilepictureurl(), holder.dp);
 		if (checker == true){
 			for (int i=0; i<mimicdata.size(); i++)				
 			{

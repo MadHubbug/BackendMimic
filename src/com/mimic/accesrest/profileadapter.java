@@ -2,8 +2,10 @@ package com.mimic.accesrest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
-import com.mimic.accesrest.MainActivity.MyViewHolder;
+
+import com.mimic.accesrest.profile.MyViewHolder;
 
 
 import android.app.Activity;
@@ -14,6 +16,11 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextPaint;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +53,8 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 	private final boolean[] mHighlightedPositions = new boolean[100];
 	private boolean checker = true;
 	public Typeface type;
-	private String user;
+	private String user, actualuser, owns;
+	private final int[] likenumpos = new int[50];
 	
 	
 	public profileadapter(Activity a, LayoutInflater l, ArrayList <MimicData> m){
@@ -57,6 +65,7 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 		type = Typeface.createFromAsset(a.getAssets(), "fonts/Roboto-Regular.ttf");
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("profileid", "madfresco");
+		actualuser = prefs.getString("username", "madfresco");
 	}
 		
 	@Override
@@ -87,7 +96,6 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 			holder = new MyViewHolder();
 			holder.description= (TextView) ConvertView.findViewById(R.id.commentpagedescription);
 			holder.likesnum= (TextView) ConvertView.findViewById(R.id.commentpagelikecount);
-			holder.echonum= (TextView) ConvertView.findViewById(R.id.commentpageechocount);
 			holder.commentnum= (TextView) ConvertView.findViewById(R.id.commentpagereplycount);
 			holder.timestamp = (TextView) ConvertView.findViewById(R.id.profilepagetimestamp); 
 			
@@ -106,20 +114,29 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 						int a = (Integer) v.getTag();
 						final String x = Integer.toString(y);
 						if (likedpositions[a] == true){
+							Log.d("what is likecounter", likenumpos[a]+""); 
 							mimic.setLikes(false);
 							likedpositions[a] = false;
 							dislike.execute(x);
 							//notifyDataSetChanged();
 							Log.d("what is ", "play: "+ mimic.getLikes());
+							likenumpos[a] -= 1;
+							mimic.setlikecounter(holder.likecount);
+							holder.likesnum.setText(Integer.toString(likenumpos[a]));
 							holder.like.setImageResource(R.drawable.like);			
 						}else if (likedpositions[a] == false){
 						
-							likes.execute(x, user);
+							likes.execute(x, user, holder.username, actualuser, owns);
+							Log.d("username", holder.username+ " ");
 							Log.d("what is x", x);
 							mimic.setLikes(true);
 							likedpositions[a] = true;
 							//notifyDataSetChanged();
 							Log.d("what is ", "play: "+ mimic.getLikes());
+							Log.d("what is likecounter", likenumpos[a]+"");
+							likenumpos[a] += 1;
+							mimic.setlikecounter(holder.likecount);
+							holder.likesnum.setText(Integer.toString(likenumpos[a]));
 							holder.like.setImageResource(R.drawable.liked);
 						}
 							
@@ -236,10 +253,14 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 		
 		mimic = mimicdata.get(pos);
 		holder.mimic = mimic;
+		holder.username = mimic.getUsername();
+		Log.d("whatis", holder.username+":"+mimic.getUsername());
 		holder.description.setText(mimic.getsharecount());
 		holder.description.setTypeface(type);
 		holder.likesnum.setText(Integer.toString(mimic.getlikecounter()));
 		holder.likesnum.setTypeface(type);
+		holder.likecount = mimic.getlikecounter();
+		Log.d("what", holder.likecount+"");
 		holder.commentnum.setText(mimic.getcommentcounter());
 		holder.commentnum.setTypeface(type);
 		holder.timestamp.setText(mimic.gettime());
@@ -247,12 +268,20 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 		holder.posturl = mimic.getposturl();
 		holder.postid = mimic.getpostid();
 		holder.like.setTag(pos);
-		
+		holder.own = mimic.getowner();
+		if (holder.own == true){
+			owns = "true";
+		} else if (holder.own == false){
+			owns = "false";
+		}
+		Log.d("before checker", holder.likecount+"");
 		if (checker == true){
 			for (int i=0; i<mimicdata.size(); i++)				
 			{
 				mimic = mimicdata.get(i);
 				holder.liked = mimic.getLikes();
+				holder.likecount=mimic.getlikecounter();
+				likenumpos[i] = holder.likecount;
 				
 			if (holder.liked == true){
 				likedpositions[i] = true;				
@@ -280,7 +309,13 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 //	    		mProgressUpdater.mBarToUpdate = null;
 //	    	}
 	    }
-		
+		Pattern tagMatcher = Pattern.compile("#([ء-يA-Za-z0-9_-]+)");
+		String newActivityURL = "content://com.mimic.accesrest.hash/";
+		Linkify.addLinks(holder.description, tagMatcher, newActivityURL);
+		Pattern tagMatch = Pattern.compile("[@]+[A-Za-z0-9-_]+\\b");
+		String newActivity = "mimic://com.mimic.accesrest.profile/";
+		Linkify.addLinks(holder.description,tagMatch, newActivity);
+		stripUnderlines(holder.description);
 		
 		
 		
@@ -293,6 +328,29 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	  private void stripUnderlines(TextView textView) {
+	        Spannable s = new SpannableString(textView.getText());
+	        URLSpan[] spans = s.getSpans(0, s.length(), URLSpan.class);
+	        for (URLSpan span: spans) {
+	            int start = s.getSpanStart(span);
+	            int end = s.getSpanEnd(span);
+	            s.removeSpan(span);
+	            span = new URLSpanNoUnderline(span.getURL());
+	            s.setSpan(span, start, end, 0);
+	        }
+	        textView.setText(s);
+	    }
+	   private class URLSpanNoUnderline extends URLSpan {
+	        public URLSpanNoUnderline(String url) {
+	            super(url);
+	        }
+	        @Override public void updateDrawState(TextPaint ds) {
+	            super.updateDrawState(ds);
+	            ds.setUnderlineText(false);
+	        }
+	    }
+	   
 	private void startPlaying(String url) {
         // TODO Auto-generated method stub
 		

@@ -6,11 +6,13 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -38,6 +40,8 @@ public class search extends SherlockActivity{
 		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
 		getSupportActionBar().setTitle("Search");
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
+
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		this.searchlist = (ListView) findViewById(R.id.searchlist);
 		this.layoutinflater = LayoutInflater.from(this);
@@ -111,10 +115,11 @@ public class search extends SherlockActivity{
 	}
 	
 	 public static class MyHolder {
-		 public ImageButton dp, follow;
+		 public ImageButton follow;
 		 public TextView username;
+		 public ImageView dp;
 		 public searchdata searchdata;
-		 public String profileurl;
+		 public String profileurl, usern;
 		 public int profileid;
 
 	 }

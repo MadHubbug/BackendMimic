@@ -3,17 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-   android:paddingTop="10dp" 
-    android:paddingBottom="10dp">
+   android:paddingTop="6dp" 
+    android:paddingBottom="6dp"
+    xmlns:app="http://schemas.android.com/apk/res/com.mimic.accesrest">
 
-    <ImageView
+    <com.pkmmte.circularimageview.CircularImageView
         android:id="@+id/commentdisplaypic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="50dp"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="3dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="33dp"
+        android:layout_marginTop="0dp"
         android:src="@drawable/dp" 
-        android:layout_marginLeft="16dp"/>
+        app:civ_border="true"
+        app:civ_border_width="1dp"
+        app:civ_border_color="#6A7172"
+    />
+
 
     <TextView
         android:id="@+id/commentusername"
@@ -21,9 +28,9 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/commentdisplaypic"
         android:layout_marginTop="14dp"
-        android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@+id/commentdisplaypic"
-        android:text="Madfresco"
+        android:layout_marginLeft="88dp"
+        android:layout_alignParentLeft="true"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="15sp" />
 
@@ -48,7 +55,7 @@
         android:layout_marginTop="5dp"
 
         android:layout_toRightOf="@+id/commentusername"
-        android:text="10s"
+        android:text="0s"
         android:textColor="@color/descriptioncolor"
         android:textSize="9sp" />
 

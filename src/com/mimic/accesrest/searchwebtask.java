@@ -22,19 +22,20 @@ public class searchwebtask extends AsyncTask<String, Integer, String>{
 	private search activity;
 	private static final String debugtag = "profileBackgroundtask";
 	private String user;
+	private progdialogs prog;
 	public searchwebtask (search activity){
 		super();
 		this.activity = activity; 
 		this.context = this.activity.getApplicationContext();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
-		
+		prog = new progdialogs(this.activity);
 	}
 	
 	@Override
 	protected void onPreExecute(){
 		super.onPreExecute();
-		progdialog = ProgressDialog.show(this.activity, "Search", "Looking for your mimics", true, false);
+		prog.show();
 	}
 	
 	@Override
@@ -87,6 +88,7 @@ public class searchwebtask extends AsyncTask<String, Integer, String>{
 				e.printStackTrace();
 			}
 		this.activity.setUsers(searchdata);
+		prog.dismiss();
 		}
 		
 		

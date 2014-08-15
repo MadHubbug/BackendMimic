@@ -18,6 +18,7 @@
     </style>
     
     <style name="Mimictheme" parent="@style/Theme.Sherlock.Light">
+        <item name="ptrHeaderStyle">@style/Widget.Custom.PtrHeader</item>
         <item name="android:actionBarSize">56dp</item>
         <item name="actionBarSize">56dp</item>
         <item name="android:actionBarStyle">@style/Mimictheme.ActionBarStyle</item>
@@ -58,6 +59,39 @@
 <style name="dialogbox" parent="@android:style/Theme.Holo.Dialog.NoActionBar">
    
 </style>
+<style name="Widget.Custom.PtrHeader" parent="android:Widget">
+  <!-- The background of the header view -->
+  <item name="ptrHeaderBackground">@color/grey</item>
 
+  
+
+  
+
+
+
+  <!-- Style of the Progress Bar. Values are either: inside or outside -->
+  <item name="ptrProgressBarStyle">outside</item>
+
+  <!-- The strings to be displayed at the various states -->
+  <item name="ptrPullText">"Pull to Refresh"</item>
+  <item name="ptrRefreshingText">"Looking for mimics"</item>
+  <item name="ptrReleaseText">"All Done!"</item>
+</style>
+
+
+
+ <style name="TransparentProgressDialog" parent="@android:Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTitleStyle">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+    
+ 
 
 </resources>

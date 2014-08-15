@@ -19,17 +19,26 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.android.Util;
+import com.mimic.accesrest.notifications.Notifications;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.parse.Parse;
+import com.parse.PushService;
+import com.pkmmte.circularimageview.CircularImageView;
 
 
 
 
 
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.text.Spannable;
@@ -60,11 +69,13 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 	private int currentpage = 1;
 	private static final String logtaskact = "MainUI";
 	private MimicAdapter mimicadapter;	
-	private UiLifecycleHelper uiHelper;
+	public UiLifecycleHelper uiHelper;
 	private boolean d = true;
 	private boolean stop = true;
-	private PullToRefreshLayout mPullToRefreshLayout;
+	public MediaPlayer player;
+	public PullToRefreshLayout mPullToRefreshLayout;
 	private ImageView view;
+	public progdialogs prog;
 	private Session.StatusCallback statusCallback = new Session.StatusCallback() {
 	   
 		@Override
@@ -90,6 +101,14 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
+		 ImageLoader.getInstance().init(config);
+	
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String user = prefs.getString("username", "madfresco");
+//		String userid = prefs.getString("profileid", "0");
+		PushService.subscribe(this, "user"+user, Notifications.class);
+		
 		setContentView(R.layout.activity_main);
 		 mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
 
@@ -105,12 +124,12 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 						d=true;
 						currentpage=1;
 						mimic();
-						mPullToRefreshLayout.setRefreshComplete();
+						
 						}
 					})
 		            // Finally commit the setup to our PullToRefreshLayout
 		            .setup(mPullToRefreshLayout);
-		this.MimicList = (ListView) findViewById(R.id.listView1);
+		this.MimicList = (ListView) findViewById(R.id.mimiclist);
 		MimicList.setOnScrollListener(this);
 		this.layoutinflater = LayoutInflater.from(this);
 		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
@@ -120,7 +139,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setIcon(R.drawable.logo);
 		view = (ImageView) findViewById(android.R.id.home);
-		
 		ImageButton buttonpost = (ImageButton) findViewById(R.id.postbutton);
 		buttonpost.setOnClickListener((OnClickListener) this);
 		ImageButton notification = (ImageButton) findViewById(R.id.notificationbutton);
@@ -131,8 +149,9 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 		explore.setOnClickListener((OnClickListener) this);
 		ImageButton home = (ImageButton) findViewById(R.id.homebutton);
 		home.setOnClickListener((OnClickListener) this);
-		
-		
+		player = new MediaPlayer();
+		prog = new progdialogs(this);
+		prog.show();
 		uiHelper = new UiLifecycleHelper(this, statusCallback);
 	    uiHelper.onCreate(savedInstanceState); 
 		Session session = Session.getActiveSession();
@@ -154,7 +173,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 		registerlistcallback();
 		
 			}	
-	
+
 	 @Override
 	    protected void onResume() {
 	        super.onResume();
@@ -182,7 +201,8 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 
 	    @Override
 	    protected void onDestroy() {
-	        super.onDestroy();
+	        
+	    	super.onDestroy();
 	        uiHelper.onDestroy();
 	    }
 
@@ -197,24 +217,60 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 	@Override
 		public void onClick (View v){
 		if (v.getId() == R.id.homebutton){
+			if (mimicadapter == null){
+				   Log.d("mimc", "mimicadapter player is null foo!");
+				}else{
+				mimicadapter.player.stop();
+					mimicadapter.player.release();
+				}
 			startActivity(new Intent(MainActivity.this, MainActivity.class));
+			this.finish();
 		}
 		else if (v.getId() == R.id.postbutton)
 		{
+			if (mimicadapter == null){
+				   Log.d("mimc", "mimicadapter player is null foo!");
+				}else{
+				mimicadapter.player.stop();
+					
+				}
 			startActivity(new Intent(MainActivity.this, post.class));
 			
+			
 		}else if(v.getId() == R.id.profilebutton){
+			if (mimicadapter == null){
+				   Log.d("mimc", "mimicadapter player is null foo!");
+				}else{
+				mimicadapter.player.stop();
+					mimicadapter.player.release();
+				}
 			Intent x = new Intent(MainActivity.this, profile.class);
 			x.putExtra("profileurl", "http://mimictheapp.herokuapp.com/profiles/");
 			startActivity(x);
+			this.finish();
 		}
 		else if(v.getId() == R.id.notificationbutton){
-
+			if (mimicadapter == null){
+			   Log.d("mimc", "mimicadapter player is null foo!");
+			}else{
+			mimicadapter.player.stop();
+				mimicadapter.player.release();
+			}
 		Intent x = new Intent(MainActivity.this, Notifications.class);
 		startActivity(x);
+		this.finish();
 		}
 		else if (v.getId() == R.id.explorebutton){
-			startActivity(new Intent(MainActivity.this, Explore.class));		}
+			if (mimicadapter == null){
+				   Log.d("mimc", "mimicadapter player is null foo!");
+				}else{
+				mimicadapter.player.stop();
+					mimicadapter.player.release();
+				}
+			
+		
+			startActivity(new Intent(MainActivity.this, Explore.class));	
+			this.finish();}
 }
 
 
@@ -250,17 +306,18 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 				        case android.R.id.home:
 				            this.finish();
 				            return true;
-				        case R.id.logout:
-				        	Session.getActiveSession().closeAndClearTokenInformation();
-				        	return true;
+//				        case R.id.logout:
+//				        	Session.getActiveSession().closeAndClearTokenInformation();
+//				        	return true;
 					default:
 		         return super.onOptionsItemSelected(item);
 		         
 		   }
 		}
 	
+	
 	public void mimic(){
-		
+	
 		try{
 			task = new MimicWebTask(MainActivity.this);
 			task.execute(1);
@@ -280,11 +337,13 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 			if (this.mimic == null){
 				this.mimic = mimic;
 				mimicadapter = new MimicAdapter(this,this.layoutinflater, this.mimic);
+				mimicadapter.uiHelper = uiHelper;
 				this.MimicList.setAdapter(mimicadapter);
 				d=false;
 			}else{
 			for (int i = 0; i<mimic.size(); i++){
 				this.mimic.add(mimic.get(i));
+				mimicadapter.checker = true;
 				mimicadapter.notifyDataSetChanged();
 				Log.d("counts", "mimic count:"+ mimic.size());
 				
@@ -296,6 +355,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 		
 			this.mimic = mimic;
 			mimicadapter = new MimicAdapter(this,this.layoutinflater, this.mimic);
+			mimicadapter.uiHelper = uiHelper;
 			this.MimicList.setAdapter(mimicadapter);
 			d=false;
 			Log.d("counts", "mimic count:"+ mimic.size());
@@ -314,7 +374,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 			Log.d("stopped", "stopped");
 		}
 	}else{
-		Log.d("no follwers", "i know");
+		startActivity(new Intent(MainActivity.this, initfollow.class));
 	}
 }
 	
@@ -327,11 +387,12 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
         public TextView user, description, echonum, commentnum, likesnum, duration, timestamp;
         public MimicData mimic;
         public ImageButton like, play, share, reply, echo;
-        public String posturl, profileurl;
+        public String posturl, profileurl, sharetitle, username;
         public SeekBar sb;
-        public ImageView dp;
+//        public ImageView dp;
         public int postid, likecount;
-        public Boolean liked;
+        public Boolean liked, own;
+        public CircularImageView dp;
 
     }
     
@@ -362,7 +423,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if (scrollState == SCROLL_STATE_IDLE) {
-	        if (MimicList.getLastVisiblePosition() >= MimicList.getCount() - 1 - 1) {
+	        if (MimicList.getLastVisiblePosition() >= MimicList.getCount() - 3 - 1) {
 	            currentpage = currentpage + 1;
 	            //load more list items:
 	            new MimicWebTask(MainActivity.this).execute(currentpage);

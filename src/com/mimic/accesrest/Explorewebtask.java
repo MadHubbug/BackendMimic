@@ -85,12 +85,12 @@ public class Explorewebtask extends AsyncTask<Integer, Integer, String>{
 				int postid = post.getInt("id");
 				Boolean likesbool = post.getBoolean("favourites");
 				String timestamp = post.getString("time");
-				
+				Boolean owner = post.getBoolean("own");
 				if (next == "null"){
 					Log.d("ending", "end is here");
-					mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, false));
+					mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, false, owner));
 				}else{
-				mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, true));
+				mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, true, owner));
 				}
 			}
 			
@@ -100,6 +100,7 @@ public class Explorewebtask extends AsyncTask<Integer, Integer, String>{
 			}
 		
 		this.activity.setUsers(mimicdata);
+		this.activity.prog.dismiss();
 		}
 		
 		

@@ -2,19 +2,21 @@ package com.mimic.accesrest;
 
 public class commentdata {
 
-	private String commenturl, profilepictureurl, commentuser, times;
-	
+	private String commenturl, profilepictureurl, commentuser, times, profileurl;
 
 	
-	public commentdata(String commenturl, String commentuser, String profilepictureurl, String times){
+	public commentdata(String commenturl, String commentuser, String profilepictureurl, String times, String profileurl){
 		this.commenturl = commenturl;
 		this.commentuser = commentuser;
 		this.profilepictureurl = profilepictureurl;
 		this.times = times;
+		this.profileurl = profileurl;
 		
 	}
 	
-
+	public String getuser(){
+		return profileurl;
+	}
 	public String gettimes(){
 		return times;
 	}

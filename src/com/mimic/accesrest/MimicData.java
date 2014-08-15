@@ -4,11 +4,13 @@ public class MimicData {
 
 	private String username, profilepictureurl, posturl, url, description, timestamp, profileurl;
 	private Integer commentcounter, likeCounter, postid;
-	private Boolean likes, last;
+	private Boolean likes, last, owner;
 	
 	
 	
-	public MimicData(String Username, String dpurl, String Url,  int postid, Integer likecounter, Integer commentcount, String posturl, String description, Boolean likes, String timestamp, String profileurl, boolean last){
+	public MimicData(String Username, String dpurl, String Url,  int postid, Integer likecounter, 
+			Integer commentcount, String posturl, String description, Boolean likes,
+			String timestamp, String profileurl, boolean last, boolean owner){
 		this.last = last;
 		this.username = Username;
 		this.profilepictureurl = dpurl;
@@ -21,9 +23,13 @@ public class MimicData {
 		this.postid = postid;
 		this.timestamp= timestamp;
 		this.profileurl=profileurl;	
+		this.owner = owner;
 		
 	}
 	
+	public boolean getowner(){
+		return owner;
+	}
 	public String getprofileurl(){
 		return profileurl;
 	}

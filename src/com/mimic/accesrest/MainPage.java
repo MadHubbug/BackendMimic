@@ -3,21 +3,26 @@ package com.mimic.accesrest;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.Session.OpenRequest;
 import com.facebook.Session.StatusCallback;
 import com.facebook.LoggingBehavior;
 import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.android.Facebook;
+import com.facebook.model.GraphUser;
 //import com.mimic.accesrest.signup.SessionStatusCallback;
 
 import android.app.Activity;
@@ -27,9 +32,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
@@ -39,7 +48,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-public class MainPage extends Activity implements OnClickListener{
+public class MainPage extends SherlockActivity implements OnClickListener{
 	
 	private static final String LOG_TAG = "MainPage";
 	private Intent x;
@@ -70,12 +79,18 @@ if (state.isOpened()) {
 	
 }
 
-
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	
-		
-		getActionBar().hide();
+		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
+		SpannableString s = new SpannableString("mimic");
+		s.setSpan(new Typefacespan(this, "Roboto-Medium.ttf"), 0, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		getSupportActionBar().setTitle(s);
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setIcon(R.drawable.logo);	
+		getSupportActionBar().hide();
+		Log.d("HEY, WE'RE FROM MAINPAGE", "woot");
 		setContentView(R.layout.mainpagelanding);
 		Button signup = (Button) findViewById(R.id.Signuplanding);
 		signup.setOnClickListener(this);
@@ -138,38 +153,43 @@ if (state.isOpened()) {
 	    super.onActivityResult(requestCode, resultCode, data);
 	    Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
 	    if (Session.getActiveSession() != null || Session.getActiveSession().isOpened()){
+	    	OpenRequest op = new Session.OpenRequest(MainPage.this);
+	    	op.setCallback(null);
+	    	 List<String> permissions = new ArrayList<String>();
+	         permissions.add("publish_stream");
+	         permissions.add("publish_actions");
+	         permissions.add("email");
+	         op.setPermissions(permissions);
+	         
+	         
+	         
 	    	
-	    	
-	    	new Request(
-	    		    Session.getActiveSession(),
-	    		    "/me",
-	    		    null,
-	    		    HttpMethod.GET,
-	    		    new Request.Callback() {
-	    		        public void onCompleted(Response response) {
-	    		        	try{
-	    		        		Response x = response;
-	    		        		JSONObject fbobj = response.getGraphObject().getInnerJSONObject();
-	    		        		Log.d(LOG_TAG, fbobj.getString("name"));
-	    		    				id= fbobj.getInt("id");
-	    		    				Log.d(LOG_TAG, id+"");
-	    		    				name = fbobj.getString("name");
-	    		    				
+	     	new Request(
+	     			Session.getActiveSession(),
+	     			"/me",
+	     			null,
+	     			HttpMethod.GET,
+	     			new Request.Callback() {
+	     			public void onCompleted(Response response) {
+	     			try{
+	     			Response x = response;
+	     			JSONObject fbobj = response.getGraphObject().getInnerJSONObject();
+	     			int fbid= fbobj.getInt("id");
+	     			String name = fbobj.getString("name");
+	     			
+	     			Log.d(LOG_TAG, "oncomplete request/add intent function");
 
-	    		    				
-	    			                Log.d(LOG_TAG, "oncomplete request/add intent function");
-	    		    				
-	    			                addintent(id, name);
-	    			    			
-	    		    				
-	    		    			}catch (JSONException e){
-	    		    				
-	    		    				e.printStackTrace();
-	    		    			}
-	    		        }
-	    		        
-	    		    }
-	    		).executeAsync();
+	     			addintent(fbid, name);
+
+
+	     			}catch (JSONException e){
+
+	     			e.printStackTrace();
+	     			}
+	     			}
+
+	     			}
+	     			).executeAsync();
 	    	
 	    	
   

@@ -24,6 +24,7 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 	private JSONArray respobj;
 	private JSONObject post;
 	private String user;
+	private progdialogs prog;
 	
 	public profilewebtask (profile activity){
 		super();
@@ -31,13 +32,15 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 		this.context = this.activity.getApplicationContext();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
+		prog = new progdialogs(this.activity);
 		
 	}
 	
 	@Override
 	protected void onPreExecute(){
 		super.onPreExecute();
-		progdialog = ProgressDialog.show(this.activity, "Search", "Looking for your mimics", true, false);
+		prog.show();
+//		progdialog = ProgressDialog.show(this.activity, "Search", "Looking for your mimics", true, false);
 	}
 	
 	@Override
@@ -61,7 +64,7 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 		
 		ArrayList<profiledata> profiledata= new ArrayList<profiledata>(); 
 		ArrayList<MimicData> mimicdata = new ArrayList<MimicData>();
-		progdialog.dismiss();
+		prog.dismiss();
 		
 		
 		if(result.length() == 0){
@@ -75,15 +78,16 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 				JSONObject l = posts.getJSONObject(x);
 				int comments = l.getInt("commentscount");
 				int likes = l.getInt("likescount");
-				String username = null;
+				String username = post.getString("username");
 				String dpurl = null;
 				String url = l.getString("url");
 				String posturl = l.getString("posturls");
 				String description = l.getString("description");
-				Boolean bool = false;
+				boolean owner = l.getBoolean("own");
+				Boolean bool = l.getBoolean("favourites");
 				int postid = l.getInt("id");
 				String timestamp = l.getString("time");
-				mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, bool, timestamp, null, true));
+				mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, bool, timestamp, null, true, owner));
 			}
 				Log.d("What is post","post is: "+post);
 				String Username = post.getString("username");
@@ -91,15 +95,21 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 				int followers = post.getInt("followingcount");
 				int followings = post.getInt("followerscount");
 				int postcount = post.getInt("postcount");
-				String fullname = null;
+				String fullname = post.getString("fullname");
 				String profileurl = post.getString("profilepictureurl");
 				Boolean follows = post.getBoolean("follows");
 				String postid = post.getString("profileid");
+				boolean owner = post.getBoolean("own");
+				String description = post.getString("description");
+				if (description.equals("null")) {
+					description = " ";
+				}
+
 				
 				
 				
 				
-				profiledata.add(new profiledata(fullname, Username, followings, followers, profileurl, postcount, follows, postid));
+				profiledata.add(new profiledata(fullname, Username, followings, followers, profileurl, postcount, follows, postid, description,owner));
 				
 			
 			
@@ -120,8 +130,15 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 			
 			return w;
 		}catch (Exception e){
-			JSONObject r = new JSONObject(result);
-			return r;
+			try{JSONObject r = new JSONObject(result);
+			JSONArray s = r.getJSONArray("results");
+			JSONObject m = s.getJSONObject(0);
+			
+			return m;
+			} catch(Exception s){
+				JSONObject r = new JSONObject(result);
+				return r;
+			}
 			
 		}
 		

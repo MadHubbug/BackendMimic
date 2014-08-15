@@ -102,7 +102,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/fullnamesettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/editText2"
@@ -119,7 +119,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/commentpagedescription"
-        android:layout_below="@+id/editText1"
+        android:layout_below="@+id/fullnamesettings"
         android:text="Email"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 

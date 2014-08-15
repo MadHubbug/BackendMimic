@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/initwelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:text="Welcome to Mimic! "
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/grey" />
+
+    <TextView
+        android:id="@+id/initdesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/initwelcome"
+        android:layout_below="@+id/initwelcome"
+        android:layout_marginTop="5dp"
+        android:text="You don&apos;t seem to be following anyone. Follow these users to begin:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/descriptioncolor" />
+
+    <ListView
+        android:id="@+id/initlistview"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/initdesc" 
+        android:layout_marginTop="10dp">
+
+    </ListView>
+
+    <ImageButton
+        android:id="@+id/initnext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/initlistview"
+        android:background="@android:color/transparent"
+        android:src="@drawable/next" 
+        android:layout_marginTop="10dp"/>
+
+</RelativeLayout>

@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.mimic.accesrest.comment.MyCommentHolder;
-import com.fedorvlasov.lazylist.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -46,7 +49,7 @@ public class commentadapter extends BaseAdapter{
 			this.activity = a;
 			this.layoutinflater = l;
 			this.commentdata = m;
-			imageloader=new ImageLoader(activity.getApplicationContext());
+//			imageloader=new ImageLoaderConfigurationeLoader();
 			type = Typeface.createFromAsset(a.getAssets(), "fonts/Roboto-Regular.ttf");
         	
 			
@@ -73,13 +76,40 @@ public class commentadapter extends BaseAdapter{
 		@Override
 		public View getView(final int pos, View ConvertView, ViewGroup parent) {
 			final MyCommentHolder holder;
-			
+			imageloader = ImageLoader.getInstance();
 			if (ConvertView == null){
 				ConvertView = layoutinflater.inflate(R.layout.commentrows, parent, false);
 				holder = new MyCommentHolder();		
-				player = new MediaPlayer();
+				
 				holder.dp = (ImageView)ConvertView.findViewById(R.id.commentdisplaypic);
+				
+				holder.dp.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						Log.d("whats in this", "what: "+ holder.profileurl);
+						Intent x = new Intent(activity, profile.class);
+						x.putExtra("profileurl", holder.profileurl);
+						x.putExtra("prof", true);
+						activity.startActivity(x);
+						
+					}
+					
+				});
 				holder.user = (TextView) ConvertView.findViewById(R.id.commentusername);
+				holder.user.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View arg0) {
+						Log.d("whats in this", "what: "+ holder.profileurl);
+						Intent x = new Intent(activity, profile.class);
+						x.putExtra("profileurl", holder.profileurl);
+						x.putExtra("prof", true);
+						activity.startActivity(x);
+						
+					}
+					
+				});
 				holder.commentplays = (ImageButton) ConvertView.findViewById(R.id.commentplay);
 				holder.commentplays.setFocusable(false);
 				holder.times = (TextView) ConvertView.findViewById(R.id.commenttimestamp);
@@ -170,10 +200,11 @@ public class commentadapter extends BaseAdapter{
 			holder.commenturl = comments.getcommenturl();
 			holder.user.setText(comments.getusercommenturl());
 			holder.user.setTypeface(type);
+			holder.profileurl= comments.getuser();
 			holder.times.setText(comments.gettimes());
 			holder.times.setTypeface(type);
 			String na = comments.getprofilepictureurl();
-			imageloader.DisplayImage(na, holder.dp, 88);
+			imageloader.displayImage(na, holder.dp);
 			holder.commentplays.setTag(pos);
 			ConvertView.setTag(holder);
 			commentx = (comment) this.activity;

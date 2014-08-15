@@ -44,8 +44,11 @@ import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 
 import com.facebook.UiLifecycleHelper;
-import com.fedorvlasov.lazylist.ImageLoader;
+//import com.fedorvlasov.lazylist.ImageLoader;
 import com.mimic.accesrest.posting.apacheHttpClientPost;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.pkmmte.circularimageview.CircularImageView;
 import com.stream.aws.Response;
 
 
@@ -70,6 +73,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 import android.preference.PreferenceManager;
 
 public class signup extends SherlockFragmentActivity	{
@@ -91,6 +95,7 @@ private static byte[] buff = new byte[1024];
 private ImageLoader imageloader;
 private String imageURL, id;
 private ProgressDialog progdialog;
+private int responseid;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,20 +103,26 @@ private ProgressDialog progdialog;
 		setContentView(R.layout.signup);
 		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
 		getSupportActionBar().setTitle("Sign Up");
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setIcon(R.drawable.back);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		Log.d("HEY, WE'RE FROM SIGNUP", "woot");
 		editor = prefs.edit();
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
+		ImageLoader.getInstance().init(config);
+		imageloader = ImageLoader.getInstance();
 		Bundle bundle = getIntent().getExtras();
-		imageloader=new ImageLoader(this);
+//		imageloader=new ImageLoader(this);
 		username = (EditText) findViewById(R.id.editText3);
-		dp = (ImageView) findViewById(R.id.dppic);
-//		namebun = bundle.getString("name");
+		dp = (CircularImageView) findViewById(R.id.dppic);
+		namebun = bundle.getString("name");
+		Log.d("namebun", namebun);
 		fbid = bundle.getInt("fbid");
 	    imageURL = "http://graph.facebook.com/"+fbid+"/picture?type=large";
 	    
 	    Log.d("fbid", fbid+"");
-	    imageloader.DisplayImage(imageURL, dp, 200);
+	    imageloader.displayImage(imageURL, dp);
 		
 		
 		
@@ -132,18 +143,32 @@ private ProgressDialog progdialog;
 			@Override
 			public void onClick(View v) {
 				usernamebun = username.getText().toString();
+				if (username.getText().toString().contains(" ")) {
+				     username.setError("No Spaces Allowed");
+				     Toast.makeText(signup.this, "No Spaces Allowed", 5000).show();
+				 }else if (username.getText().toString().equals("")){
+					 username.setError("Username can't be empty");
+				 }
+
+				else{
 				progdialog = ProgressDialog.show(signup.this, "Register", "Registration is in progress", true, false);
-				new ValidateCredentialsTask().execute();
-				editor.putString("username", usernamebun);
-				editor.apply();
+				apacheHttpClientPost post = new apacheHttpClientPost();
+				Log.d(LOG_TAG, "Thisis");
+				post.execute("http://mimictheapp.herokuapp.com/users/");
+				Log.d(LOG_TAG, "Executing gg");
+
+				
 				
 				Log.d("SHAREDPREFERENCES", prefs.getString("fullname", "there's nothing here"));
-				
+				}
 			
 				
 			}
+
+
 		});
 	
+		
 		
 //		uiHelper = new UiLifecycleHelper(this, statusCallback);
 //	    uiHelper.onCreate(savedInstanceState); 
@@ -185,8 +210,169 @@ private ProgressDialog progdialog;
 
 	}
 
-	
+	public class apacheHttpClientPost extends AsyncTask<String,String,Void> {
+		@Override
+		protected Void doInBackground(String... params) {
+			// TODO Auto-generated method stub
+		
+			try {
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
 
+				nameValuePairs.add(new BasicNameValuePair("\"username\"", "\""+usernamebun+"\""));
+				nameValuePairs.add(new BasicNameValuePair("\"email\"", "\""+"mimic@g.com"+"\""));
+				nameValuePairs.add(new BasicNameValuePair("\"password\"", "\""+"genocide212"+"\""));
+				
+				
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				HttpPost postRequest = new HttpPost(params[0]);
+				StringEntity entity = new StringEntity(getQueryJSON(nameValuePairs));
+				Log.d(LOG_TAG,getQueryJSON(nameValuePairs));
+				postRequest.setHeader("Content-type","application/json");
+				postRequest.setEntity(entity);
+				Log.d(LOG_TAG, "noresponse");  
+				postRequest.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
+				HttpResponse response = httpClient.execute(postRequest);
+				httpClient.getConnectionManager().shutdown();
+
+					Log.d("Log'd", response.getStatusLine().getStatusCode()+" ");
+					responseid = response.getStatusLine().getStatusCode();
+
+				
+			
+				
+
+			} catch (MalformedURLException e) {
+				progdialog.dismiss();
+				   username.setError("No Spaces Allowed");
+				     Toast.makeText(signup.this, "Username already used", 5000).show();
+				e.printStackTrace();
+				
+			} catch (IOException e) {
+				
+				progdialog.dismiss();
+				   username.setError("No Spaces Allowed");
+				     Toast.makeText(signup.this, "Username already used", 5000).show();
+				e.printStackTrace();
+
+			}
+			return null;
+			
+			
+				
+
+		}
+		@Override
+		protected void onPostExecute(Void param) {
+		
+			if(responseid == 400){
+				progdialog.dismiss();
+				username.setError("Username used already");
+				
+			}else{
+				editor.putString("username", usernamebun);
+				editor.apply();
+				new ValidateCredentialsTask().execute();
+			}
+		}
+
+	}
+
+	
+	public class Register extends AsyncTask<Void, Void, Void>{
+		String retval = null;
+		@Override
+		protected Void doInBackground(Void... params) {
+			try{
+			List<NameValuePair> ValuePairs = new ArrayList<NameValuePair>(3);
+			ValuePairs.add(new BasicNameValuePair("\"username\"", "\""+usernamebun+"\""));
+			ValuePairs.add(new BasicNameValuePair("\"profilepictureurl\"", "\""+imageURL+"\""));
+			ValuePairs.add(new BasicNameValuePair("\"username\"", "\""+usernamebun+"\""));
+			ValuePairs.add(new BasicNameValuePair("\"fullname\"", "\""+namebun+"\""));
+			DefaultHttpClient postclient = new DefaultHttpClient();
+			HttpPost request = new HttpPost("http://mimictheapp.herokuapp.com/profiles/");
+			Log.d(LOG_TAG, getQueryJSON(ValuePairs));
+			StringEntity ent = new StringEntity(getQueryJSON(ValuePairs));
+			request.setHeader("Content-type","application/json");
+			request.setEntity(ent);
+			Log.d(LOG_TAG, "noresponse");  
+			request.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
+			postclient.execute(request);
+			postclient.getConnectionManager().shutdown();
+			
+		}catch(Exception e){
+			
+		}
+		Log.d("are we even here?", "what");
+		HttpGet GetRequest = new HttpGet("http://mimictheapp.heroku.com/profiles/");
+		
+         
+		try{
+			DefaultHttpClient newclient = new DefaultHttpClient();
+			GetRequest.addHeader("Authorization", "Basic " + Base64.encodeToString((usernamebun+":"+"genocide212").getBytes(), Base64.NO_WRAP));
+			GetRequest.setHeader("Content-type","application/json");
+			HttpResponse response = newclient.execute(GetRequest);
+			
+			Log.d(logtag,"try");
+			
+			
+			HttpEntity ent = response.getEntity();
+			
+			InputStream ist = ent.getContent();
+			ByteArrayOutputStream content = new ByteArrayOutputStream();
+			Log.d(logtag, "byte array output stream");
+
+			int readCount = 0;
+			Log.d(logtag, "while loop");
+			while ((readCount = ist.read(buff)) != -1) {
+				content.write(buff, 0, readCount);
+			}
+			
+			retval = new String(content.toByteArray());
+			newclient.getConnectionManager().shutdown();
+		} catch (Exception e){
+			Log.d("catch", "catch");
+		} try{
+			Log.d("show me", "the money");
+			JSONArray array = new JSONArray(retval);
+			JSONObject s= array.getJSONObject(0);
+			String q = s.getString("profileid");
+			id = q;
+			Log.d("SHAREDPREFERENCEKEY1", id+"");
+			
+			editor.putString("profileid", q);
+			editor.apply();
+			Log.d("SHAREDPREFERENCEKEY2", prefs.getString("profileid", "Nothings here"));
+			
+			
+		}catch (Exception e){
+			
+		}try {
+			List<NameValuePair> followpairs = new ArrayList<NameValuePair>(3);
+			followpairs.add(new BasicNameValuePair("\"following\"", id));
+			followpairs.add(new BasicNameValuePair("\"follower\"", id));
+			DefaultHttpClient httpClients = new DefaultHttpClient();
+			HttpPost followreq = new HttpPost("http://mimictheapp.herokuapp.com/postfollows/");
+			StringEntity enti = new StringEntity(getQueryJSON(followpairs));
+			Log.d("id", id+"");
+			Log.d("followpairs",getQueryJSON(followpairs));
+			followreq.setHeader("Content-type","application/json");
+			followreq.setEntity(enti);
+			Log.d(LOG_TAG, "noresponse");  
+			followreq.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
+			httpClients.execute(followreq);
+			httpClients.getConnectionManager().shutdown();
+			progdialog.dismiss();
+			Intent i = new Intent(signup.this, MainActivity.class);
+			startActivity(i);
+			finish();
+			
+		}catch(Exception e){
+			
+		}
+		return null;
+		}
+		
+	}
 //	 @Override
 //	    public void onStart() {
 //	        super.onStart();
@@ -283,11 +469,7 @@ private ProgressDialog progdialog;
 		@Override
 		protected void onPostExecute(String result){
 			try{
-				apacheHttpClientPost post = new apacheHttpClientPost();
-				Log.d(LOG_TAG, "Thisis");
-				post.execute("http://mimictheapp.herokuapp.com/users/");
-				Log.d(LOG_TAG, "Executing gg");
-
+			new Register().execute();
 
 			}catch (Exception exception){
 
@@ -340,136 +522,7 @@ private ProgressDialog progdialog;
 
 	}
 	
-	public class apacheHttpClientPost extends AsyncTask<String,String,Void> {
-		@Override
-		protected Void doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			String retval = null;
-			try {
-				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
 
-				nameValuePairs.add(new BasicNameValuePair("\"username\"", "\""+usernamebun+"\""));
-				nameValuePairs.add(new BasicNameValuePair("\"email\"", "\""+"mimic@g.com"+"\""));
-				nameValuePairs.add(new BasicNameValuePair("\"password\"", "\""+"genocide212"+"\""));
-				
-				
-				DefaultHttpClient httpClient = new DefaultHttpClient();
-				HttpPost postRequest = new HttpPost(params[0]);
-				StringEntity entity = new StringEntity(getQueryJSON(nameValuePairs));
-				Log.d(LOG_TAG,getQueryJSON(nameValuePairs));
-				postRequest.setHeader("Content-type","application/json");
-				postRequest.setEntity(entity);
-				Log.d(LOG_TAG, "noresponse");  
-				postRequest.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
-				httpClient.execute(postRequest);
-				httpClient.getConnectionManager().shutdown();
-				
-				try{
-					List<NameValuePair> ValuePairs = new ArrayList<NameValuePair>(3);
-					ValuePairs.add(new BasicNameValuePair("\"username\"", "\""+usernamebun+"\""));
-					ValuePairs.add(new BasicNameValuePair("\"profilepictureurl\"", "\""+imageURL+"\""));
-					DefaultHttpClient postclient = new DefaultHttpClient();
-					HttpPost request = new HttpPost("http://mimictheapp.herokuapp.com/profiles/");
-					Log.d(LOG_TAG, getQueryJSON(ValuePairs));
-					StringEntity ent = new StringEntity(getQueryJSON(ValuePairs));
-					request.setHeader("Content-type","application/json");
-					request.setEntity(ent);
-					Log.d(LOG_TAG, "noresponse");  
-					request.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
-					postclient.execute(request);
-					postclient.getConnectionManager().shutdown();
-					
-				}catch(Exception e){
-					
-				}
-				Log.d("are we even here?", "what");
-				HttpGet GetRequest = new HttpGet("http://mimictheapp.heroku.com/profiles/");
-				
-	             
-				try{
-					DefaultHttpClient newclient = new DefaultHttpClient();
-					GetRequest.addHeader("Authorization", "Basic " + Base64.encodeToString((usernamebun+":"+"genocide212").getBytes(), Base64.NO_WRAP));
-					GetRequest.setHeader("Content-type","application/json");
-					HttpResponse response = newclient.execute(GetRequest);
-					
-					Log.d(logtag,"try");
-					
-					
-					HttpEntity ent = response.getEntity();
-					
-					InputStream ist = ent.getContent();
-					ByteArrayOutputStream content = new ByteArrayOutputStream();
-					Log.d(logtag, "byte array output stream");
-
-					int readCount = 0;
-					Log.d(logtag, "while loop");
-					while ((readCount = ist.read(buff)) != -1) {
-						content.write(buff, 0, readCount);
-					}
-					
-					retval = new String(content.toByteArray());
-					newclient.getConnectionManager().shutdown();
-				} catch (Exception e){
-					Log.d("catch", "catch");
-				} try{
-					Log.d("show me", "the money");
-					JSONArray array = new JSONArray(retval);
-					JSONObject s= array.getJSONObject(0);
-					String q = s.getString("profileid");
-					id = q;
-					Log.d("SHAREDPREFERENCEKEY1", id+"");
-					
-					editor.putString("profileid", q);
-					editor.apply();
-					Log.d("SHAREDPREFERENCEKEY2", prefs.getString("profileid", "Nothings here"));
-					
-					
-				}catch (Exception e){
-					
-				}try {
-					List<NameValuePair> followpairs = new ArrayList<NameValuePair>(3);
-					followpairs.add(new BasicNameValuePair("\"following\"", id));
-					followpairs.add(new BasicNameValuePair("\"follower\"", id));
-					DefaultHttpClient httpClients = new DefaultHttpClient();
-					HttpPost followreq = new HttpPost("http://mimictheapp.herokuapp.com/follows/");
-					StringEntity enti = new StringEntity(getQueryJSON(followpairs));
-					Log.d("id", id+"");
-					Log.d("followpairs",getQueryJSON(followpairs));
-					followreq.setHeader("Content-type","application/json");
-					followreq.setEntity(enti);
-					Log.d(LOG_TAG, "noresponse");  
-					followreq.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
-					httpClients.execute(followreq);
-					httpClients.getConnectionManager().shutdown();
-					progdialog.dismiss();
-					Intent i = new Intent(signup.this, MainActivity.class);
-					startActivity(i);
-					finish();
-					
-				}catch(Exception e){
-					
-				}
-				
-			
-				
-
-			} catch (MalformedURLException e) {
-
-				e.printStackTrace();
-
-			} catch (IOException e) {
-
-				e.printStackTrace();
-
-			}
-			return null;
-			
-			
-				
-
-		}
-
-	}
 
 
 

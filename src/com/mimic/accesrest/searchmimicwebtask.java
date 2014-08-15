@@ -75,6 +75,7 @@ public class searchmimicwebtask extends AsyncTask<String, Integer, String>{
 			String dpurl = user.getString("profilepictureurl");
 			String profileurl = user.getString("url");
 			String url= post.getString("url");
+			boolean owner = post.getBoolean("own");
 			String posturl = post.getString("posturls");
 			String description = post.getString("description");
 			if (description == "null"){
@@ -87,7 +88,7 @@ public class searchmimicwebtask extends AsyncTask<String, Integer, String>{
 			String timestamp = post.getString("time");
 			
 			
-			mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, true));
+			mimicdata.add(new MimicData(username, dpurl, url, postid, likes, comments, posturl, description, likesbool, timestamp, profileurl, true, owner));
 			
 		}
 				

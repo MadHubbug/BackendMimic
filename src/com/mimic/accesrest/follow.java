@@ -12,16 +12,23 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.mimic.accesrest.notifications.notificationpost;
+import com.stream.aws.Response;
+
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
-public class follow extends AsyncTask<String,String,Void> {
+public class follow extends AsyncTask<String,String,Response> {
+	private String post, user, username, actualuser, owns;
 	@Override
-	protected Void doInBackground(String... params) {
+	protected Response doInBackground(String... params) {
 		int x = 1;
-		String user = params[1];
-		String post = params[0];
+		user = params[1];
+		post = params[0];
+		username = params[2];
+		actualuser = params[3];
+		owns = "false";
 
 		try {
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
@@ -33,7 +40,7 @@ public class follow extends AsyncTask<String,String,Void> {
 
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			Log.d("appache", "httpclient");        
-			HttpPost postRequest = new HttpPost("http://mimictheapp.herokuapp.com/follows/");
+			HttpPost postRequest = new HttpPost("http://mimictheapp.herokuapp.com/postfollows/");
 			postRequest.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
 			StringEntity entity = new StringEntity(getQueryJSON(nameValuePairs));
 			Log.d("apache",getQueryJSON(nameValuePairs));
@@ -61,7 +68,14 @@ public class follow extends AsyncTask<String,String,Void> {
 	}
 
 
+	@Override
+	protected void onPostExecute(Response response) {
+		notificationpost notif= new notificationpost();
+		notif.execute(post, user, "follows", username, actualuser, owns);
 
+		
+
+	}
 private String getQueryJSON(List<NameValuePair> params) throws UnsupportedEncodingException
 
 {

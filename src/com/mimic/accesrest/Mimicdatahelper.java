@@ -40,7 +40,7 @@ public class Mimicdatahelper {
 		}
 	}
 	
-	protected static synchronized String downloadFromServer(String url, String username)throws ApiException{
+	public static synchronized String downloadFromServer(String url, String username)throws ApiException{
 	
 		String retval = null;
 		

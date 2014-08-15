@@ -12,15 +12,23 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.mimic.accesrest.notifications.notificationpost;
+import com.mimic.accesrest.posting.Createbucket;
+import com.stream.aws.Response;
+
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
-public class liking extends AsyncTask<String,String,Void> {
+public class liking extends AsyncTask<String,String,Response> {
+	public String user, post, username, actualuser, owns;
 	@Override
-	protected Void doInBackground(String... params) {
-		String user = params[1];
-		String post = params[0];
+	protected Response doInBackground(String... params) {
+		user = params[1];
+		post = params[0];
+		username = params[2];
+		actualuser = params[3];
+		owns = params[4];
 
 		try {
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
@@ -56,8 +64,20 @@ public class liking extends AsyncTask<String,String,Void> {
 
 		}
 		return null;
+	
+		
 
 	}
+	
+	@Override
+	protected void onPostExecute(Response response) {
+		notificationpost notif= new notificationpost();
+		notif.execute(post, user, "likes", username, actualuser, owns);
+
+		
+
+	}
+
 
 
 

@@ -40,12 +40,13 @@ public class commentdatahelper {
 			
 			String Commenturl = "http://mimictheapp.herokuapp.com/posts/"+post+"/?format=json";
 			String retval = null;
+			String user = fbid;
 			
 			Log.d(logtag, "Fetching ");
 			
 			HttpClient client = new DefaultHttpClient();
 			HttpGet request = new HttpGet(Commenturl);               
-			request.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
+			request.addHeader("Authorization", "Basic " + Base64.encodeToString((user+":"+"genocide212").getBytes(), Base64.NO_WRAP));
 			Log.d(logtag,"statusline");
 			
 			try{
