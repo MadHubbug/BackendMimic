@@ -21,20 +21,22 @@ public class initfollowwebtask extends AsyncTask<Void, Integer, String>{
 	private Context context;
 	private initfollow activity;
 	private static final String debugtag = "profileBackgroundtask";
-	private String user;
+	private String user, password;
 	public initfollowwebtask (initfollow activity){
 		super();
 		this.activity = activity; 
 		this.context = this.activity.getApplicationContext();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
-		
+		password = prefs.getString("password", "genocide212");
+		Log.d("password", password);
+		Log.d("user", user);
 	}
 	
 	@Override
 	protected void onPreExecute(){
 		super.onPreExecute();
-		progdialog = ProgressDialog.show(this.activity, "Search", "Looking for your mimics", true, false);
+//		progdialog = ProgressDialog.show(this.activity, "Search", "Looking for your mimics", true, false);
 	}
 	
 	@Override
@@ -42,7 +44,7 @@ public class initfollowwebtask extends AsyncTask<Void, Integer, String>{
 //		String query = q[0]; 
 		try{
 			Log.d(debugtag, "profileBackground");
-			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/profilesearch/?page_size=5", user);
+			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/profilesearch/?page_size=5", user, password);
 			return result;
 		}
 		catch (Exception e)
@@ -58,7 +60,7 @@ public class initfollowwebtask extends AsyncTask<Void, Integer, String>{
 		
 		ArrayList<searchdata> searchdata = new ArrayList<searchdata>(); 
 		
-		progdialog.dismiss();
+//		progdialog.dismiss();
 		
 		
 		if(result.length() == 0){
@@ -75,7 +77,7 @@ public class initfollowwebtask extends AsyncTask<Void, Integer, String>{
 			boolean follows = returnval.getBoolean("follows");
 			String dp = returnval.getString("profilepictureurl");
 			String profileurl = returnval.getString("url");
-			searchdata.add(new searchdata(username, dp, follows, profid, profileurl));
+			searchdata.add(new searchdata(username, dp, follows, profid, profileurl, false));
 			
 			}
 			

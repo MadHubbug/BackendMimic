@@ -40,7 +40,7 @@ public class Mimicdatahelper {
 		}
 	}
 	
-	public static synchronized String downloadFromServer(String url, String username)throws ApiException{
+	public static synchronized String downloadFromServer(String url, String username, String password)throws ApiException{
 	
 		String retval = null;
 		
@@ -49,7 +49,7 @@ public class Mimicdatahelper {
 		MimicDataUserURL = url;
 		HttpClient client = new DefaultHttpClient();
 		HttpGet request = new HttpGet(MimicDataUserURL);               
-		request.addHeader("Authorization", "Basic " + Base64.encodeToString((user+":"+"genocide212").getBytes(), Base64.NO_WRAP));
+		request.addHeader("Authorization", "Basic " + Base64.encodeToString((user+":"+password).getBytes(), Base64.NO_WRAP));
 		
 		try{
 			

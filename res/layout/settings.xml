@@ -13,7 +13,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
-        android:src="@drawable/dp" 
+        android:src="@drawable/stub" 
         app:civ_border="true"
         app:civ_border_width="1dp"
         app:civ_border_color="#6A7172"
@@ -43,7 +43,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="15dp"
         android:ems="10"
-        android:maxLines="1" >
+        android:maxLines="1" 
+          android:inputType="textPersonName">
 
         <requestFocus />
     </EditText>
@@ -59,7 +60,9 @@
         android:textColor="@color/descriptioncolor"
         android:textColorHint="@color/descriptioncolor"
         android:textSize="16sp" 
-        android:layout_marginLeft="20dp"/>
+        android:layout_marginLeft="20dp"
+        
+        />
 
     <EditText
         android:id="@+id/descriptionsettings"
@@ -71,7 +74,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="15dp"
         android:ems="10"
-        android:maxLines="1" />
+        android:maxLength="100"
+  android:inputType="textPersonName"/>
 
     <TextView
         android:id="@+id/TextView02"
@@ -95,6 +99,34 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="15dp"
         android:ems="10"
-        android:maxLines="1" />
+        android:maxLines="1" 
+android:inputType="textEmailAddress" />
+
+    <LinearLayout
+        android:id="@+id/LogOutl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/emailaddsettings"
+        android:layout_marginBottom="21dp"
+        android:background="@color/dividercolor"
+        android:orientation="vertical"
+        android:padding="2dp" >
+
+        <TextView
+            android:id="@+id/LogOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:text="Log Out"
+            android:gravity="center"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/descriptioncolor"
+            android:textSize="20sp" />
+
+    </LinearLayout>
 
 </RelativeLayout>

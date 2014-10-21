@@ -21,7 +21,7 @@ public class dropdownwebtask extends AsyncTask<String, Integer, String>{
 	private Context context;
 	private posting activity;
 	private static final String debugtag = "profileBackgroundtask";
-	private String user, userid;
+	private String user, userid, password;
 	public dropdownwebtask (posting activity){
 		super();
 		this.activity = activity; 
@@ -29,6 +29,7 @@ public class dropdownwebtask extends AsyncTask<String, Integer, String>{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
 		userid = prefs.getString("profileid", "0");
+		password = prefs.getString("password", "genocide212");
 		
 	}
 	
@@ -43,7 +44,7 @@ public class dropdownwebtask extends AsyncTask<String, Integer, String>{
 		String q = query[0];
 		try{
 			Log.d(debugtag, "profileBackground");
-			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/follows/?follower="+userid+"&format=json&page="+ q, user);
+			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/follows/?follower="+userid+"&format=json&page="+ q, user, password);
 			return result;
 		}
 		catch (Exception e)

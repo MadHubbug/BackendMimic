@@ -10,6 +10,8 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -25,7 +27,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.parse.Parse;
 import com.parse.PushService;
 import com.pkmmte.circularimageview.CircularImageView;
-
+//import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshAttacher;
 
 
 
@@ -55,6 +57,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -92,8 +95,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 			Exception exception) {
 		if (state.isClosed()) {
             Log.i(logtaskact, "Logged out...");
-            Intent intent = new Intent(this, MainPage.class);
-            this.startActivity(intent);
+            
 		}
 		
 }
@@ -101,11 +103,15 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
-		 ImageLoader.getInstance().init(config);
-	
+		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String user = prefs.getString("username", "madfresco");
+		SharedPreferences.Editor edt = prefs.edit();
+		edt.putBoolean("logged", true);
+		edt.commit();
+		String profileid = prefs.getString("profileid", "madfresco");
+		String bucket = prefs.getString("bucket", "bucket");
+		Log.d("mainActivity", profileid + ":" + bucket);
 //		String userid = prefs.getString("profileid", "0");
 		PushService.subscribe(this, "user"+user, Notifications.class);
 		
@@ -150,8 +156,13 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 		ImageButton home = (ImageButton) findViewById(R.id.homebutton);
 		home.setOnClickListener((OnClickListener) this);
 		player = new MediaPlayer();
+		if (prog==null){
 		prog = new progdialogs(this);
-		prog.show();
+		if (!prog.isShowing()){
+			prog.show();
+			}
+		}
+		
 		uiHelper = new UiLifecycleHelper(this, statusCallback);
 	    uiHelper.onCreate(savedInstanceState); 
 		Session session = Session.getActiveSession();
@@ -201,7 +212,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 
 	    @Override
 	    protected void onDestroy() {
-	        
+	        prog=null;
 	    	super.onDestroy();
 	        uiHelper.onDestroy();
 	    }
@@ -267,10 +278,11 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 				mimicadapter.player.stop();
 					mimicadapter.player.release();
 				}
-			
+			Log.d("Is this", "is it happening?");
 		
 			startActivity(new Intent(MainActivity.this, Explore.class));	
-			this.finish();}
+			this.finish();
+			}
 }
 
 
@@ -306,9 +318,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 				        case android.R.id.home:
 				            this.finish();
 				            return true;
-//				        case R.id.logout:
-//				        	Session.getActiveSession().closeAndClearTokenInformation();
-//				        	return true;
+				       
 					default:
 		         return super.onOptionsItemSelected(item);
 		         
@@ -317,7 +327,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 	
 	
 	public void mimic(){
-	
+		
 		try{
 			task = new MimicWebTask(MainActivity.this);
 			task.execute(1);
@@ -339,11 +349,13 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 				mimicadapter = new MimicAdapter(this,this.layoutinflater, this.mimic);
 				mimicadapter.uiHelper = uiHelper;
 				this.MimicList.setAdapter(mimicadapter);
+//				mimicadapter.checker = true;
+				
 				d=false;
 			}else{
 			for (int i = 0; i<mimic.size(); i++){
 				this.mimic.add(mimic.get(i));
-				mimicadapter.checker = true;
+//				mimicadapter.checker = true;
 				mimicadapter.notifyDataSetChanged();
 				Log.d("counts", "mimic count:"+ mimic.size());
 				
@@ -358,6 +370,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 			mimicadapter.uiHelper = uiHelper;
 			this.MimicList.setAdapter(mimicadapter);
 			d=false;
+//			mimicadapter.checker = true;
 			Log.d("counts", "mimic count:"+ mimic.size());
 		
 		}else{
@@ -366,6 +379,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
 				this.mimic.add(mimic.get(i));
 				mimicadapter.notifyDataSetChanged();
 				Log.d("counts", "mimic count:"+ mimic.size());
+//				mimicadapter.checker = true;
 			}
 			
 		}
@@ -393,24 +407,24 @@ public class MainActivity extends SherlockActivity implements OnClickListener, O
         public int postid, likecount;
         public Boolean liked, own;
         public CircularImageView dp;
-
+        public RelativeLayout row;
     }
     
 
     
     
     public void registerlistcallback(){
-    	this.MimicList.setAdapter(mimicadapter);
-    	this.MimicList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int position,
-					long arg3) {
-				
-				MimicData mimics = (MimicData) mimicadapter.getItem(position);
-				Log.d("You clicked", mimics.getUsername());
-			}
-		});
+//    	this.MimicList.setAdapter(mimicadapter);
+//    	this.MimicList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> arg0, View arg1, int position,
+//					long arg3) {
+//				
+//				MimicData mimics = (MimicData) mimicadapter.getItem(position);
+//				Log.d("You clicked", mimics.getUsername());
+//			}
+//		});
     }
 
 	@Override

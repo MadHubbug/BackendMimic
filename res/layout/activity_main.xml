@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-      <LinearLayout
+          <LinearLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,15 +16,25 @@
         
 
         >
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="horizontal"
+        android:gravity="center"
 
-        <ImageButton
-            android:id="@+id/homebutton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:paddingRight="0dip"
-            android:layout_weight="1"
-            android:src="@drawable/homebuttonclicked" />
+        
+
+        >
+
+          <ImageButton
+              android:id="@+id/homebutton"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:background="@android:color/transparent"
+              android:paddingRight="0dip"
+              android:src="@drawable/homebuttonclicked" />
 
         <ImageButton
             android:id="@+id/explorebutton"
@@ -65,6 +75,7 @@
             android:src="@drawable/profilebuttonunclicked" />
 
     </LinearLayout>
+    </LinearLayout>
 
 <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
     
@@ -78,8 +89,8 @@
         android:id="@+id/mimiclist"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-
-        android:background="@android:color/white"
+		android:clickable="true"
+		android:background="@color/white"
         android:divider="@drawable/list_divider" >
         
     </ListView>

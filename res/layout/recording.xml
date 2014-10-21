@@ -24,7 +24,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="15dp"
-                android:text="Post "
+                android:text="POST"
                 android:textSize="25dp"
                 android:layout_marginLeft="16dp"
                 android:textColor="@color/descriptioncolor"
@@ -57,8 +57,9 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="40dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/recwhite"
-            android:paddingBottom="76dp" />
+         	android:paddingBottom="11dp"
+            android:src="@drawable/recwhite" />
+
          <ImageButton
             android:id="@+id/playpostcomment"
             android:layout_width="wrap_content"
@@ -69,6 +70,7 @@
             android:background="@android:color/transparent"
             android:src="@drawable/biggerplay" 
             android:layout_centerHorizontal="true"
+            android:paddingBottom="10dp"
             />
          
                  <TextView
@@ -81,31 +83,29 @@
             android:text="30s"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/white" />
-         
+
+                 <ImageButton
+                     android:id="@+id/deletecomment"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_alignRight="@+id/label"
+                     android:layout_marginTop="15dp"
+                     android:layout_alignTop="@+id/playpostcomment"
+                     android:background="@android:color/transparent"
+                     android:src="@drawable/delete" />
+
+                 <ImageButton
+                     android:id="@+id/nextbuttoncomment"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_alignTop="@+id/playpostcomment"
+                     android:layout_toLeftOf="@+id/close"
+                     android:layout_marginTop="15dp"
+                     android:background="@android:color/transparent"
+                     android:paddingBottom="10dp"
+                     android:src="@drawable/next" />
                  
 </RelativeLayout>
-        <ImageButton
-            android:id="@+id/nextbuttoncomment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/lay"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop ="20dp"
-            android:background="@android:color/transparent"
-            android:paddingBottom="10dp"
-            android:src="@drawable/next" />
-
-
-        <ImageButton
-            android:id="@+id/deletecomment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignTop="@+id/nextbuttoncomment"
-            android:layout_marginLeft="33dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/delete" />
 
 
 

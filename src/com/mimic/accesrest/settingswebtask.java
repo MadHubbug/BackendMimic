@@ -25,7 +25,7 @@ public class settingswebtask extends AsyncTask<String, Integer, String>{
 	private static final String debugtag = "profileBackgroundtask";
 	private JSONArray respobj;
 	private JSONObject post;
-	private String user;
+	private String user, password;
 	
 	public settingswebtask (settings activity){
 		super();
@@ -33,6 +33,7 @@ public class settingswebtask extends AsyncTask<String, Integer, String>{
 		this.context = this.activity.getApplicationContext();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
+		password = prefs.getString("password", "genocide212");
 		
 	}
 	
@@ -47,7 +48,7 @@ public class settingswebtask extends AsyncTask<String, Integer, String>{
 		String query = x[0];
 		try{
 			Log.d(debugtag, "profileBackground");
-			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/profiles/", user);
+			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/profiles/", user, password);
 			return result;
 		}
 		catch (Exception e)

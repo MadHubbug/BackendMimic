@@ -36,7 +36,7 @@ public class commentdatahelper {
 			}
 		}
 		
-		protected static synchronized String downloadFromServer(int post, String fbid) throws ApiException{
+		protected static synchronized String downloadFromServer(int post, String fbid, String password) throws ApiException{
 			
 			String Commenturl = "http://mimictheapp.herokuapp.com/posts/"+post+"/?format=json";
 			String retval = null;
@@ -46,7 +46,7 @@ public class commentdatahelper {
 			
 			HttpClient client = new DefaultHttpClient();
 			HttpGet request = new HttpGet(Commenturl);               
-			request.addHeader("Authorization", "Basic " + Base64.encodeToString((user+":"+"genocide212").getBytes(), Base64.NO_WRAP));
+			request.addHeader("Authorization", "Basic " + Base64.encodeToString((user+":"+password).getBytes(), Base64.NO_WRAP));
 			Log.d(logtag,"statusline");
 			
 			try{

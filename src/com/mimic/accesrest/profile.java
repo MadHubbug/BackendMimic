@@ -74,7 +74,9 @@ public class profile extends SherlockActivity implements OnClickListener{
 				Log.d("profileurl", x);	
 				y = bundle.getBoolean("prof");
 			 }
-	
+
+			getSupportActionBar().setDisplayShowHomeEnabled(false);
+		
 		profbutton = (ImageButton) findViewById(R.id.profilebuttonprofpage);
 		profbutton.setOnClickListener(this);
 		description = (TextView) findViewById(R.id.postclickable);
@@ -98,7 +100,7 @@ public class profile extends SherlockActivity implements OnClickListener{
 				if (follows == true){
 					
 					follows=false;
-					tounfollow.execute(postid);
+					tounfollow.execute(postid, user);
 					follow.setImageResource(R.drawable.followprof);			
 				}else if (follows== false){
 					
@@ -272,6 +274,7 @@ public class profile extends SherlockActivity implements OnClickListener{
 		if (own == true){
 		btn.setVisibility(View.VISIBLE);
 		follow.setVisibility(View.GONE);
+	
 		}else{
 			getSupportActionBar().setDisplayShowHomeEnabled(true);
 			getSupportActionBar().setHomeButtonEnabled(true);

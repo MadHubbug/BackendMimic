@@ -23,7 +23,7 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 	private static final String debugtag = "profileBackgroundtask";
 	private JSONArray respobj;
 	private JSONObject post;
-	private String user;
+	private String user, password;
 	private progdialogs prog;
 	
 	public profilewebtask (profile activity){
@@ -33,6 +33,8 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
 		prog = new progdialogs(this.activity);
+		password = prefs.getString("password", "genocide212");
+		Log.d("password", password);
 		
 	}
 	
@@ -48,7 +50,7 @@ public class profilewebtask extends AsyncTask<String, Integer, String>{
 		String query = x[0];
 		try{
 			Log.d(debugtag, "profileBackground");
-			String result = Mimicdatahelper.downloadFromServer(query, user);
+			String result = Mimicdatahelper.downloadFromServer(query, user, password);
 			return result;
 		}
 		catch (Exception e)

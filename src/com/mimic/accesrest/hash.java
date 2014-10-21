@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 public class hash extends SherlockActivity {
 	private ArrayList<MimicData> mimic;
@@ -51,7 +52,19 @@ public class hash extends SherlockActivity {
 					
 				}
 			
-		}	
+		
+		}
+	 
+		@Override
+	    public boolean onOptionsItemSelected(MenuItem item) {
+	        switch (item.getItemId()) {
+	        case android.R.id.home:
+	            Log.d("did you", "click?");
+	        	this.finish();
+	            return true;
+	        }
+	        return super.onOptionsItemSelected(item);
+	    }
 		
 	 public void setMimics(ArrayList<MimicData> mimicdata){
 			this.mimic= mimicdata;

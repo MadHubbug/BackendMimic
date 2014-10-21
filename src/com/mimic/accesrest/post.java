@@ -92,7 +92,7 @@ public class post extends SherlockActivity {
 	
 	private void startRecording(){
 		// Start recording
-		//mRecorder = ExtAudioRecorder.getInstanse(true);	  // Compressed recording (AMR)
+//		mRecorder = ExtAudioRecorder.getInstanse(true);	  // Compressed recording (AMR)
 		mRecorder = ExtAudioRecorder.getInstanse(false); // Uncompressed recording (WAV)
 		mRecorder.setOutputFile(mFileName);
 		
@@ -155,7 +155,7 @@ public class post extends SherlockActivity {
 			
 		});
 		final MyCounter timer = new MyCounter(30000, 1000);
-		getWindow().setDimAmount((float) 0.80);
+//		getWindow().setDimAmount((float) 0.80);
 		getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		getWindow().setGravity(Gravity.BOTTOM);
 		delete = (ImageButton) findViewById(R.id.deletecomment);

@@ -108,7 +108,7 @@ public class notificationadapter extends BaseAdapter{
 				
 			});
 			
-			holder.desc.setOnClickListener(new OnClickListener(){
+			holder.description.setOnClickListener(new OnClickListener(){
 
 				@Override
 				public void onClick(View v) {

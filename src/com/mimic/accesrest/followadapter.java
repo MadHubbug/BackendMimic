@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.mimic.accesrest.MainActivity.MyViewHolder;
 import com.mimic.accesrest.followinglist.FollowHolder;
 import com.mimic.accesrest.search.MyHolder;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.app.Activity;
@@ -29,6 +30,7 @@ public class followadapter extends BaseAdapter{
 	private ArrayList<searchdata> mimicdata;
 	private searchdata searchdata;
 	private ImageLoader imageloader;
+	private DisplayImageOptions options;
 
 	private String profileurl, user;
 public followadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
@@ -39,7 +41,14 @@ public followadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 		imageloader=ImageLoader.getInstance();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("profileid", "0");
-		
+		options = new DisplayImageOptions.Builder()
+		.showImageOnLoading(R.drawable.stub)
+		.showImageForEmptyUri(R.drawable.stub)
+		.showImageOnFail(R.drawable.stub)
+		.cacheInMemory(true)
+		.cacheOnDisk(true)
+		.considerExifParams(true)
+		.build();
 		
 	}
 
@@ -106,7 +115,7 @@ public followadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 		
 		holder.profileid = mimicdata.get(pos).getid();
 		profileurl = holder.profileurl;
-		imageloader.displayImage(mimicdata.get(pos).getprofilepictureurl(), holder.dp);
+		imageloader.displayImage(mimicdata.get(pos).getprofilepictureurl(), holder.dp, options);
 		
 		
 		return ConvertView;

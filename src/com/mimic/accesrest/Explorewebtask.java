@@ -19,7 +19,7 @@ public class Explorewebtask extends AsyncTask<Integer, Integer, String>{
 	private Context context;
 	private Explore activity;
 	private static final String debugtag = "Backgroundtask";
-	private String user;
+	private String user, password;
 	
 	public Explorewebtask(Explore activity){
 		super();
@@ -27,6 +27,7 @@ public class Explorewebtask extends AsyncTask<Integer, Integer, String>{
 		this.context = this.activity.getApplicationContext();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
+		password = prefs.getString("password", "genocide212");
 	}
 	
 	@Override
@@ -40,7 +41,7 @@ public class Explorewebtask extends AsyncTask<Integer, Integer, String>{
 		int k = s[0];
 		try{
 			Log.d(debugtag, "Background");
-			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/popularposts/?page="+k+"&format=json", user);
+			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/popularposts/?page="+k+"&format=json", user, password);
 			return result;
 		}
 		catch (Exception e)

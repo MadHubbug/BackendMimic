@@ -46,8 +46,13 @@ import com.amazonaws.services.s3.transfer.Upload;
 import com.facebook.UiLifecycleHelper;
 //import com.fedorvlasov.lazylist.ImageLoader;
 import com.mimic.accesrest.posting.apacheHttpClientPost;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.DisplayImageOptions.Builder;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.pkmmte.circularimageview.CircularImageView;
 import com.stream.aws.Response;
 
@@ -63,9 +68,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -84,16 +92,16 @@ private final String logtag ="Signuptag";
 private UiLifecycleHelper uiHelper;		
 private boolean isResumed = false;
 public static AmazonClientManager clientManager = null;
-public int fbid = 0;
 private static final String LOG_TAG = "signup";
 public ImageView dp;
-public SharedPreferences prefs;
+
 public EditText name, email, username, password;
+public SharedPreferences prefs;
 public SharedPreferences.Editor editor;
-public String firstname, lastname, namebun, usernamebun, passwordbun, emailbun;
+public String firstname, lastname, namebun, usernamebun, passwordbun, emailbun, fbid;
 private static byte[] buff = new byte[1024];
 private ImageLoader imageloader;
-private String imageURL, id;
+private String imageURL, id, bucketname;
 private ProgressDialog progdialog;
 private int responseid;
 
@@ -102,7 +110,7 @@ private int responseid;
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.signup);
 		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
-		getSupportActionBar().setTitle("Sign Up");
+		getSupportActionBar().setTitle("SIGN UP");
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setIcon(R.drawable.back);
@@ -111,18 +119,47 @@ private int responseid;
 		editor = prefs.edit();
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
 		ImageLoader.getInstance().init(config);
+		DisplayImageOptions options = new DisplayImageOptions.Builder().imageScaleType(ImageScaleType.EXACTLY).build();
 		imageloader = ImageLoader.getInstance();
+		ImageSize targetsize = new ImageSize(130, 110);
 		Bundle bundle = getIntent().getExtras();
 //		imageloader=new ImageLoader(this);
-		username = (EditText) findViewById(R.id.editText3);
+		username = (EditText) findViewById(R.id.usernamesignup);
+		InputFilter filter = new InputFilter() {
+
+			@Override
+			public CharSequence filter(CharSequence source, int start, int end,
+					Spanned dest, int dstart, int dend) {
+				// TODO 
+		                for (int i = start; i < end; i++) { 
+		                        if (!Character.isLetterOrDigit(source.charAt(i))) { 
+		                                return ""; 
+		                        } 
+		                } 
+		                return null; 
+		        }
+			
+			
+		 
+	}; 
+
+	username.setFilters(new InputFilter[]{filter}); 
 		dp = (CircularImageView) findViewById(R.id.dppic);
 		namebun = bundle.getString("name");
 		Log.d("namebun", namebun);
-		fbid = bundle.getInt("fbid");
+		fbid = bundle.getString("fbid");
+		emailbun = bundle.getString("email");
 	    imageURL = "http://graph.facebook.com/"+fbid+"/picture?type=large";
 	    
 	    Log.d("fbid", fbid+"");
-	    imageloader.displayImage(imageURL, dp);
+	    imageloader.loadImage(imageURL, targetsize, options, new SimpleImageLoadingListener(){
+	    	
+	    	@Override
+	    	public void onLoadingComplete(String image, View view, Bitmap Loadedimage){
+	    		BitmapDrawable bp = new BitmapDrawable(getResources(),Loadedimage);
+	    		dp.setImageDrawable(bp);
+	    	}
+	    });
 		
 		
 		
@@ -187,7 +224,14 @@ private int responseid;
 //	                session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
 //	            }
 //        updateView();
+		
+		
+		
+		
 	}
+	
+	
+	
 	private class ValidateCredentialsTask extends
 	AsyncTask<Void, Void, Response> {
 
@@ -219,7 +263,7 @@ private int responseid;
 				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
 
 				nameValuePairs.add(new BasicNameValuePair("\"username\"", "\""+usernamebun+"\""));
-				nameValuePairs.add(new BasicNameValuePair("\"email\"", "\""+"mimic@g.com"+"\""));
+				nameValuePairs.add(new BasicNameValuePair("\"email\"", "\""+emailbun+"\""));
 				nameValuePairs.add(new BasicNameValuePair("\"password\"", "\""+"genocide212"+"\""));
 				
 				
@@ -288,13 +332,15 @@ private int responseid;
 			ValuePairs.add(new BasicNameValuePair("\"profilepictureurl\"", "\""+imageURL+"\""));
 			ValuePairs.add(new BasicNameValuePair("\"username\"", "\""+usernamebun+"\""));
 			ValuePairs.add(new BasicNameValuePair("\"fullname\"", "\""+namebun+"\""));
+			ValuePairs.add(new BasicNameValuePair("\"fbid\"", "\""+fbid+"\""));
+			ValuePairs.add(new BasicNameValuePair("\"bucket\"", "\""+bucketname+"\""));
 			DefaultHttpClient postclient = new DefaultHttpClient();
 			HttpPost request = new HttpPost("http://mimictheapp.herokuapp.com/profiles/");
 			Log.d(LOG_TAG, getQueryJSON(ValuePairs));
 			StringEntity ent = new StringEntity(getQueryJSON(ValuePairs));
 			request.setHeader("Content-type","application/json");
 			request.setEntity(ent);
-			Log.d(LOG_TAG, "noresponse");  
+			
 			request.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
 			postclient.execute(request);
 			postclient.getConnectionManager().shutdown();
@@ -447,8 +493,9 @@ private int responseid;
 				AmazonS3Client s3Client = clientManager.s3();
 				Log.d(LOG_TAG, "clientmanager");
 				try{
-					CreateBucketRequest request = new CreateBucketRequest(String.valueOf(fbid)+"mimicbucket");
+					CreateBucketRequest request = new CreateBucketRequest(fbid+"mimicbucket");
 			        Bucket bucket = s3Client.createBucket(request);
+			        bucketname = bucket.getName();
 			        editor.putString("bucket", bucket.getName());
 					editor.apply();
 					Log.d(LOG_TAG,bucket.getName());

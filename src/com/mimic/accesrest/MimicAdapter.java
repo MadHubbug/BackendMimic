@@ -11,8 +11,10 @@ import java.util.regex.Pattern;
 
 
 
+import com.facebook.Session;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.FacebookDialog;
+import com.hipmob.gifanimationdrawable.GifAnimationDrawable;
 import com.mimic.accesrest.MainActivity.MyViewHolder;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -30,7 +32,9 @@ import com.pkmmte.circularimageview.CircularImageView;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources.NotFoundException;
 import android.graphics.Typeface;
+import android.graphics.drawable.AnimationDrawable;
 
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -90,6 +94,7 @@ public class MimicAdapter extends BaseAdapter {
 	private int Color;
 	public UiLifecycleHelper uiHelper;
 	private DisplayImageOptions options;
+	private AnimationDrawable animation;
 	public MimicAdapter(Activity a, LayoutInflater l, ArrayList <MimicData> m){
 		
 		this.activity = a;
@@ -103,9 +108,9 @@ public class MimicAdapter extends BaseAdapter {
 		user = prefs.getString("profileid", "0");
 		actualusername = prefs.getString("username", "madfresco");
 		options = new DisplayImageOptions.Builder()
-		.showImageOnLoading(R.drawable.biggerplay)
-		.showImageForEmptyUri(R.drawable.biggerplay)
-		.showImageOnFail(R.drawable.biggerplay)
+		.showImageOnLoading(R.drawable.stub)
+		.showImageForEmptyUri(R.drawable.stub)
+		.showImageOnFail(R.drawable.stub)
 		.cacheInMemory(true)
 		.cacheOnDisk(true)
 		.considerExifParams(true)
@@ -161,6 +166,24 @@ public class MimicAdapter extends BaseAdapter {
 				}
 				
 			});
+			holder.row = (RelativeLayout) ConvertView.findViewById(R.id.row);
+			holder.row.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+				
+					
+					player.stop();
+					Intent intent = new Intent(activity, comment.class);
+					int y = holder.postid;
+					intent.putExtra("postid", y);
+					
+					activity.startActivity(intent);
+					
+				}
+	        	
+	        	
+	        });
 			holder.description = (TextView) ConvertView.findViewById(R.id.description);
 			holder.likesnum= (TextView) ConvertView.findViewById(R.id.likecount);
 			holder.commentnum= (TextView) ConvertView.findViewById(R.id.replycount);
@@ -180,7 +203,7 @@ public class MimicAdapter extends BaseAdapter {
 						if (likedpositions[a] == true){
 							mimic.setLikes(false);
 							likedpositions[a] = false;
-							dislike.execute(x);
+							dislike.execute(x, user);
 							//notifyDataSetChanged();
 							Log.d("what is ", "play: "+ mimic.getLikes());
 							holder.like.setImageResource(R.drawable.like);
@@ -222,6 +245,7 @@ public class MimicAdapter extends BaseAdapter {
 
 				@Override
 				public void onClick(View arg0) {
+					player.stop();
 					Log.d("whats in this", "what: "+ holder.profileurl);
 					Intent x = new Intent(activity, profile.class);
 					x.putExtra("profileurl", holder.profileurl);
@@ -248,13 +272,15 @@ public class MimicAdapter extends BaseAdapter {
 				
 				@Override
 				public void onClick(View v) {
+					
 					int position = (Integer)v.getTag();
 				    Log.d("clicked", "Button row pos click: " + position);
 				    String url = holder.posturl;
-				    
+				    Log.d("position", position+" ");
+				    Log.d("initialposition", initialposition+" ");
 				    RelativeLayout layout = (RelativeLayout)v.getParent();
 				    s = layout;
-				    ImageButton button = (ImageButton)layout.getChildAt(12);
+				    ImageButton button = (ImageButton)layout.getChildAt(11);
 				    
 				//    seekbar = (SeekBar) layout.getChildAt(5);
 				    
@@ -263,7 +289,7 @@ public class MimicAdapter extends BaseAdapter {
 				    ListView lv = (ListView) layout.getParent();
 				    for (int i=0; i < lv.getChildCount(); i++){
 				    	RelativeLayout row = (RelativeLayout) lv.getChildAt(i);
-				    	ImageButton btns = (ImageButton) row.getChildAt(12);
+				    	ImageButton btns = (ImageButton) row.getChildAt(11);
 				    	if (btns == null){
 				    		Log.d("btns", "nulull");
 ;				    	}
@@ -271,7 +297,29 @@ public class MimicAdapter extends BaseAdapter {
 				    	
 				    }
 				    
-				    if(initialposition!=-1)
+		
+				    if(position == initialposition){
+				    	if (player.isPlaying()){
+				    	Log.d("Are we going through here?", "stop ");
+				    		player.stop();
+				    		button.setImageResource(R.drawable.playbutton);
+				    		mHighlightedPositions[position] = false;
+				    		initialposition = position;
+				    	      mHighlightedPositions[position] = false;
+				    	
+				    }
+				    else{
+				    	player.stop();
+				    	button.setImageResource(R.drawable.stopbutton);
+				    	startPlaying(url, position);
+				    	initialposition = position;
+				    	mHighlightedPositions[initialposition]=false;
+				        mHighlightedPositions[position] = true;
+				        
+				        Log.d("Are we going through here?", "play same");
+				    }
+				    }
+				    else if(initialposition!=-1)
 				    {
 				    	if(mHighlightedPositions[position]) {
 				    	button.setImageResource(R.drawable.playbutton);
@@ -301,7 +349,8 @@ public class MimicAdapter extends BaseAdapter {
 				    	}
 				   }
 				    }
-				    else {
+				    
+				    else if (position != initialposition){
 				    	button.setImageResource(R.drawable.stopbutton);
 				    	mHighlightedPositions[position] = true;
 				    	if (player.isPlaying()){
@@ -333,12 +382,15 @@ public class MimicAdapter extends BaseAdapter {
 				
 				@Override
 				public void onClick(View arg0) {
+					if (Session.getActiveSession().isClosed() || Session.getActiveSession() == null){
+						Session.openActiveSession(activity, true, null);
+					}
 					if (FacebookDialog.canPresentShareDialog(activity.getApplicationContext(), 
                             FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
 					// Publish the post using the Share Dialog
 					FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(activity)
 					.setLink("https://fb.com/mimictheapp")
-					.setDescription("Shared this mimic called "+holder.sharetitle+". Sign up for beta and download the app!"	)
+					.setDescription("Shared this mimic called "+holder.sharetitle+" by " + holder.username +  ". Sign up for beta and download the app!"	)
 					
 					.build();
 					if (uiHelper == null){
@@ -363,6 +415,8 @@ public class MimicAdapter extends BaseAdapter {
 				@Override
 				public void onClick(View v) {
 				
+					
+					player.stop();
 					Intent intent = new Intent(activity, comment.class);
 					int y = holder.postid;
 					intent.putExtra("postid", y);
@@ -382,8 +436,17 @@ public class MimicAdapter extends BaseAdapter {
 	        
 			ConvertView.setTag(holder);
 			ConvertView.setOnClickListener(new OnClickListener() {
-				public void onClick(View v){
-					Log.d("hi", "hi from "+ pos);
+				@Override
+				public void onClick(View v) {
+				
+					
+					player.stop();
+					Intent intent = new Intent(activity, comment.class);
+					int y = holder.postid;
+					intent.putExtra("postid", y);
+					
+					activity.startActivity(intent);
+					
 				}
 			});
 			parents = parent;
@@ -429,13 +492,21 @@ public class MimicAdapter extends BaseAdapter {
 		String newActivity = "mimic://com.mimic.accesrest.profile/";
 		Linkify.addLinks(holder.description,tagMatch, newActivity);
 		stripUnderlines(holder.description);
-		
+		try {
+			animation = new GifAnimationDrawable(activity.getResources().openRawResource(R.raw.wheel));
+		} catch (NotFoundException e) {
+			Log.d("woah", "not working");
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		String na = mimic.geturl();
 		
 		imageloader.displayImage(na, holder.dp, options);
-		if (checker == true){
+//		if (checker == true){
 			for (int i=0; i<mimicdata.size(); i++)				
 			{
 				mimic = mimicdata.get(i);
@@ -447,9 +518,9 @@ public class MimicAdapter extends BaseAdapter {
 			}else {
 				likedpositions[i] = false;
 			}
-			checker = false;
+//			checker = false;
 			}
-			}
+//			}
 		holder.likesnum.setText(Integer.toString(likenumpos[pos]));
 		holder.likesnum.setTypeface(type);
 		if (likedpositions[pos]){
@@ -483,17 +554,23 @@ public class MimicAdapter extends BaseAdapter {
             player.setDataSource(url);
             // mPlayer.setDataSource(mFileName);
             player.prepareAsync();
+            ImageButton w = (ImageButton) s.getChildAt(11);
+            
+			w.setImageDrawable(animation);            
+            
             player.setOnPreparedListener(new OnPreparedListener() {
 				
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					
 					player.start();
+					ImageButton w = (ImageButton) s.getChildAt(11);
+					w.setImageResource(R.drawable.stopbutton);
 					player.setOnCompletionListener(new OnCompletionListener(){
 
 						@Override
 						public void onCompletion(MediaPlayer arg0) {
-							ImageButton r = (ImageButton)s.getChildAt(12);
+							ImageButton r = (ImageButton)s.getChildAt(11);
 					    	r.setImageResource(R.drawable.playbutton);
 					    	mHighlightedPositions[k] = false;
 							

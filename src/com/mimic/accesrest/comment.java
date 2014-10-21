@@ -75,15 +75,16 @@ public class comment extends SherlockActivity {
 	private int postid;
 	public boolean playingpos = true;
 	private static String mFileName = null;
+	private ExtAudioRecorder mRecorder = null;
 	public static AmazonClientManager clientManager = null;
 	private static URL newurl = null;
 	private TextView tv;
 	private ImageButton record, delete, play, next;
-	private ExtAudioRecorder mRecorder = null;
+	
 	private boolean plays = true;
 	private boolean owner;
 	private String LOG_TAG = "comment";
-	private String user, post, users, username, actualusername, owns;
+	private String user, post, users, username, actualusername, owns, password;
 	private SharedPreferences prefs;  
 	
 	private void onRecord (boolean start){
@@ -115,7 +116,7 @@ public class comment extends SherlockActivity {
 		comment(postid);
 		imageloader = ImageLoader.getInstance();
 		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
-		SpannableString s = new SpannableString("Comment");
+		SpannableString s = new SpannableString("COMMENT");
 		s.setSpan(new Typefacespan(this, "Roboto-Medium.ttf"), 0, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		getSupportActionBar().setTitle(s);
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -129,6 +130,7 @@ public class comment extends SherlockActivity {
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		users = prefs.getString("profileid", "0");
 		user = prefs.getString("profileid", "0");
+		password = prefs.getString("password", "genocide212");
 		actualusername= prefs.getString("username", "madfresco");
 		clientManager = new AmazonClientManager(getSharedPreferences(
 				"com.mimic.accessrest", Context.MODE_PRIVATE));
@@ -426,11 +428,12 @@ public class comment extends SherlockActivity {
 				playpostbutton.setImageResource(R.drawable.stopbutton);
 				player.stop();
 				playingpos = false;
+				CommentAdapter.initialposition = -1;
 			}else{
 				playpostbutton.setImageResource(R.drawable.stopbutton);
 				startPlaying(url);
 				playingpos = false;
-	
+				CommentAdapter.initialposition = -1;
 				}
 			}
 				else{
@@ -438,6 +441,7 @@ public class comment extends SherlockActivity {
 					playpostbutton.setImageResource(R.drawable.playbutton);
 					player.stop();
 					playingpos = true;
+					CommentAdapter.initialposition = -1;
 				}
 				
 			

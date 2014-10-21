@@ -1,11 +1,14 @@
 package com.mimic.accesrest;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -20,18 +23,27 @@ import org.apache.http.util.EntityUtils;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -40,8 +52,19 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.amazonaws.org.apache.http.annotation.NotThreadSafe;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.Upload;
+import com.android.camera.CropImageIntentBuilder;
+import com.facebook.Session;
 import com.mimic.accesrest.posting.apacheHttpClientPost;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.parse.PushService;
+import com.stream.aws.Response;
 
 public class settings extends SherlockActivity {
 	private String user;
@@ -50,6 +73,12 @@ public class settings extends SherlockActivity {
 	private ImageLoader imageloader;
 	private ImageView dp;
 	private String id;
+	private File display;
+	private URL displayurl;
+	private DisplayImageOptions options;
+	private SharedPreferences prefs;
+	public static AmazonClientManager clientManager = null;
+	private String LOG_TAG = "Settings";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,17 +91,115 @@ public class settings extends SherlockActivity {
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setIcon(R.drawable.back);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		user = prefs.getString("profileid", "0");
 		fullname = (EditText) findViewById(R.id.fullnamesettings);
+
 		dp = (ImageView) findViewById(R.id.dppicsettings);
 		description = (EditText) findViewById(R.id.descriptionsettings);
+
 		email = (EditText) findViewById(R.id.emailaddsettings);
+		email.setOnKeyListener(new OnKeyListener() {
+
+	        public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+
+	                if (event.getAction() == KeyEvent.ACTION_DOWN
+	                        && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+	                    Log.i("event", "captured");
+
+	                    return false;
+	                } 
+	                else if(event.getAction() == KeyEvent.ACTION_DOWN
+	                        && event.getKeyCode() == KeyEvent.KEYCODE_BACK){
+	                    Log.i("Back event Trigered","Back event");
+
+	                }
+
+	                return false;    
+
+	            }
+	        
+	        
+	    });
+		clientManager = new AmazonClientManager(getSharedPreferences(
+				"com.mimic.accessrest", Context.MODE_PRIVATE));
+		if (settings.clientManager.hasCredentials()) {
+			Log.d(LOG_TAG, "has credentials");
+		}else {
+			Log.d(LOG_TAG, "no credentials");
+		}
+		
+		 options = new DisplayImageOptions.Builder().imageScaleType(ImageScaleType.EXACTLY).build();
+		dp.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				startActivityForResult(MediaStoreUtils.getPickImageIntent(settings.this), 1);
+				
+			}
+			
+		});
+		
+		
+	
+		LinearLayout Logout = (LinearLayout) findViewById(R.id.LogOutl);
+		Logout.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				if (Session.getActiveSession() != null){
+				Session.getActiveSession().closeAndClearTokenInformation();
+				}
+				   SharedPreferences.Editor sa = prefs.edit();
+				   sa.clear();
+				   sa.commit();
+//				   prog.dismiss();
+				   Intent intent = new Intent(settings.this, MainPage.class);
+				   intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); 
+				   startActivity(intent);
+				   settings.this.finish();
+				
+				
+				Set <String> set = PushService.getSubscriptions(settings.this);
+				String[] x = new String[set.size()];
+				set.toArray(x);
+				for(int i = 0; i<x.length; i++){
+					PushService.unsubscribe(settings.this, x[i]);
+				}
+			
+			}
+			
+		});
 		
 		mimic("wow");
 
 	}
 	
+	
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		   super.onActivityResult(requestCode, resultCode, data);
+     File croppedImageFile = new File(getFilesDir(), "test.png");
+
+     if ((requestCode == 1) && (resultCode == RESULT_OK)) {
+         // When the user is done picking a picture, let's start the CropImage Activity,
+         // setting the output image file and size to 200x200 pixels square.
+         Uri croppedImage = Uri.fromFile(croppedImageFile);
+         
+         CropImageIntentBuilder cropImage = new CropImageIntentBuilder(200, 200, croppedImage);
+         cropImage.setCircleCrop(true);
+         cropImage.setSourceImage(data.getData());
+         
+          
+         startActivityForResult(cropImage.getIntent(this), 2);
+     } else if ((requestCode == 2) && (resultCode == RESULT_OK)) {
+     	
+     	display = croppedImageFile.getAbsoluteFile();
+     	imageloader.displayImage("file://"+croppedImageFile.getAbsolutePath(), dp, options);
+     	Log.d("What", "imageloading");
+     	
+     }
+ }
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		
@@ -93,7 +220,10 @@ public class settings extends SherlockActivity {
         	this.finish();
         case R.id.save:
         	try{
-				apacheHttpClientPost post = new apacheHttpClientPost();
+        		if (display!=null){
+				new putimage().execute();
+        		}
+        		apacheHttpClientPost post = new apacheHttpClientPost();
 				post.execute();
 				
         	}       catch (Exception exception){
@@ -129,6 +259,60 @@ public class settings extends SherlockActivity {
 		}
 	}
 	
+	public class putimage extends
+	AsyncTask<Response, Void, String> {
+
+
+		private String data = null;
+		@Override
+		protected String doInBackground(Response... responses) {
+
+
+	
+				
+				TransferManager manager = new TransferManager(clientManager.s3());
+				Log.d(LOG_TAG, "creating file");
+				AmazonS3Client s3Client = clientManager.s3();
+				
+				try{
+					String bucketname = prefs.getString("bucket", "nonehere");
+					Log.d("buket when uploading", bucketname);
+					PutObjectRequest por = new PutObjectRequest(bucketname, "displaypic.png", display);
+					por.withCannedAcl(CannedAccessControlList.PublicRead);
+					Upload upload = manager.upload(por);
+
+					if (upload.isDone()){
+						Log.d(LOG_TAG, "done");
+
+					} 
+
+					Log.d(LOG_TAG, upload.getDescription());
+					displayurl= s3Client.getUrl(bucketname, "displaypic.png");
+				
+					Log.d(LOG_TAG, "creating object");
+				
+//					Log.d(LOG_TAG, data);
+
+					Log.d(LOG_TAG, "posting data");
+				}
+				catch (Exception exception){
+					Log.d(LOG_TAG, "catching error");
+					Log.d("Exception", exception+ " ");
+				}
+
+
+			
+			return null;
+
+
+		}
+		
+
+
+
+	}
+	
+	
 	public class apacheHttpClientPost extends AsyncTask<String,String,Void> {
 		@Override
 		protected Void doInBackground(String... params) {
@@ -143,6 +327,9 @@ public class settings extends SherlockActivity {
 //				String email = email.getText().toString();
 				nameValuePairs.add(new BasicNameValuePair("\"description\"", "\""+descrip+"\""));
 				nameValuePairs.add(new BasicNameValuePair("\"fullname\"", "\""+name+"\""));
+				if (display!=null){
+					nameValuePairs.add(new BasicNameValuePair("\"profilepictureurl\"", "\""+displayurl+"\""));
+				}
 //				nameValuePairs.add(new BasicNameValuePair("\"\"", "\""+Title+"\""));
 				
 				DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -246,4 +433,13 @@ public class settings extends SherlockActivity {
 	    }
 	}
 	
+	
+	
 }
+
+
+
+
+
+
+

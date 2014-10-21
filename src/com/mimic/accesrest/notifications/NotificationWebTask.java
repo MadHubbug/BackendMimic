@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mimic.accesrest.Mimicdatahelper;
+import com.mimic.accesrest.progdialogs;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -23,7 +24,8 @@ public class NotificationWebTask extends AsyncTask<Void, Integer, String>{
 	private Context context;
 	private Notifications activity;
 	private static final String debugtag = "profileBackgroundtask";
-	private String s, user;
+	private String s, user, password;
+	private progdialogs progs;
 	
 	public NotificationWebTask(Notifications activity){
 		super();
@@ -31,12 +33,15 @@ public class NotificationWebTask extends AsyncTask<Void, Integer, String>{
 		this.context = this.activity.getApplicationContext();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
+		progs = new progdialogs(this.activity);
+		password = prefs.getString("password", "genocide212");
 	}
 	
 	@Override
 	protected void onPreExecute(){
 		super.onPreExecute();
-		progdialog = ProgressDialog.show(this.activity, "Search", "Looking for your mimics", true, false);
+		progs.show();
+		
 	}
 	
 	@Override
@@ -44,7 +49,7 @@ public class NotificationWebTask extends AsyncTask<Void, Integer, String>{
 		
 		try{
 			Log.d(debugtag, "profileBackground");
-			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/notifications/?format=json", user);
+			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/notifications/?format=json", user, password);
 			return result;
 		}
 		catch (Exception e)
@@ -60,8 +65,7 @@ public class NotificationWebTask extends AsyncTask<Void, Integer, String>{
 		
 		ArrayList<notificationsdata> notifdata = new ArrayList<notificationsdata>(); 
 		
-		progdialog.dismiss();
-		
+	
 		
 		if(result.length() == 0){
 		
@@ -97,6 +101,7 @@ public class NotificationWebTask extends AsyncTask<Void, Integer, String>{
 				e.printStackTrace();
 			}
 		this.activity.setUser(notifdata);
+		progs.dismiss();
 		}
 		
 		

@@ -24,12 +24,12 @@ public class unfollow extends AsyncTask<String,String,Void> {
 	protected Void doInBackground(String... params) {
 		
 		String post = params[0];
-
+		String user = params[1];
 		try {
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			Log.d("appache", "httpclient");   
 			Log.d("post", "post: " + post);
-			HttpDelete postRequest = new HttpDelete("http://192.168.5.105:8000/follows/?format=json&follower=1&following="+post);
+			HttpDelete postRequest = new HttpDelete("http://mimictheapp.herokuapp.com/follows/?follower="+user+"&following="+post);
 			Log.d("what", postRequest+ "");
 			postRequest.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
 

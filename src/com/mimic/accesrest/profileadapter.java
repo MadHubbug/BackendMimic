@@ -5,14 +5,17 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 
+import com.hipmob.gifanimationdrawable.GifAnimationDrawable;
 import com.mimic.accesrest.profile.MyViewHolder;
 
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources.NotFoundException;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -50,10 +53,12 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 //	private PlaybackUpdater mProgressUpdater = new PlaybackUpdater();
 	private MediaPlayer player = new MediaPlayer();
 //	public SeekBar seekbar;
+	private GifAnimationDrawable animation;
 	private final boolean[] mHighlightedPositions = new boolean[100];
 	private boolean checker = true;
 	public Typeface type;
 	private String user, actualuser, owns;
+	private RelativeLayout rL;
 	private final int[] likenumpos = new int[50];
 	
 	
@@ -174,13 +179,13 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 				    Log.d("clicked", "Button row pos click: " + position);
 				    String url = holder.posturl;
 				    
-				    RelativeLayout layout = (RelativeLayout)v.getParent();
-				    ImageButton button = (ImageButton)layout.getChildAt(7);
+				    rL = (RelativeLayout)v.getParent();
+				    ImageButton button = (ImageButton)rL.getChildAt(7);
 				    
 //				    seekbar = (SeekBar) layout.getChildAt(4);
 				    
 				    
-				    ListView lv = (ListView) layout.getParent();
+				    ListView lv = (ListView) rL.getParent();
 				    for (int i=0; i < lv.getChildCount(); i++){
 				    	RelativeLayout row = (RelativeLayout) lv.getChildAt(i);
 				    	ImageButton btns = (ImageButton) row.getChildAt(7);
@@ -206,14 +211,14 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 				     
 //				        	mHandler.postDelayed(mProgressUpdater, 500);
 				        	
-				        	startPlaying(url);
+				        	startPlaying(url, position);
 				  	      
 				    	} else{
 				    		mPlayingPosition = position;
 //				    		mProgressUpdater.mBarToUpdate = seekbar;
 				    	
 //				            mHandler.postDelayed(mProgressUpdater, 500);
-				    	  		startPlaying(url);
+				    	  		startPlaying(url, position);
 				    		
 				    	}
 				   }
@@ -227,7 +232,7 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 //				    		mProgressUpdater.mBarToUpdate = seekbar;
 				    
 //				            mHandler.postDelayed(mProgressUpdater, 500);
-				    		startPlaying(url);
+				    		startPlaying(url, position);
 				    		
 				    	}else
 				    	{
@@ -235,7 +240,7 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 //				    		mProgressUpdater.mBarToUpdate = seekbar;
 				    	
 //				            mHandler.postDelayed(mProgressUpdater, 500);
-				    		startPlaying(url);
+				    		startPlaying(url, position);
 				    	
 				    	}
 				    
@@ -317,6 +322,15 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 		Linkify.addLinks(holder.description,tagMatch, newActivity);
 		stripUnderlines(holder.description);
 		
+		try {
+			animation = new GifAnimationDrawable(activity.getResources().openRawResource(R.raw.wheel));
+		} catch (NotFoundException e) {
+			Log.d("woah", "not working");
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		return ConvertView;
@@ -351,8 +365,9 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
 	        }
 	    }
 	   
-	private void startPlaying(String url) {
-        // TODO Auto-generated method stub
+	private void startPlaying(String url, int tag) {
+       final int k = tag;
+		// TODO Auto-generated method stub
 		
         try {
         	
@@ -360,14 +375,28 @@ public class profileadapter extends BaseAdapter implements OnClickListener{
             player.setDataSource(url);
             // mPlayer.setDataSource(mFileName);
             player.prepareAsync();
+            ImageButton playbutt = (ImageButton) rL.getChildAt(7);
+			playbutt.setImageDrawable(animation);
             player.setOnPreparedListener(new OnPreparedListener() {
-				
+			
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					
 					player.start();
+					ImageButton w = (ImageButton) rL.getChildAt(7);
+					w.setImageResource(R.drawable.stopbutton);
 					
-					
+					player.setOnCompletionListener(new OnCompletionListener(){
+
+						@Override
+						public void onCompletion(MediaPlayer arg0) {
+							ImageButton r = (ImageButton)rL.getChildAt(7);
+					    	r.setImageResource(R.drawable.playbutton);
+					    	mHighlightedPositions[k] = false;
+							
+						}
+						
+					});
 					
 		
 			            	

@@ -7,12 +7,6 @@
           android:showAsAction="always"
            android:actionViewClass="com.actionbarsherlock.widget.SearchView"/>
 	  
-<!-- <item
-	        android:id="@+id/logout"
-	        android:icon="@drawable/ic_action_accept"
-	        android:showAsAction="ifRoom"
-	        android:title="Log Out"
-	        android:titleCondensed="Log Out">
-	    </item> -->
+
 	    
 	</menu>

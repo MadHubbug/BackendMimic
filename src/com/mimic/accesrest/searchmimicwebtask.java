@@ -21,7 +21,8 @@ public class searchmimicwebtask extends AsyncTask<String, Integer, String>{
 	private Context context;
 	private search activity;
 	private static final String debugtag = "profileBackgroundtask";
-	private String user;
+	private String user, password;
+	private progdialogs prog;
 	
 	public searchmimicwebtask (search activity){
 		super();
@@ -29,13 +30,15 @@ public class searchmimicwebtask extends AsyncTask<String, Integer, String>{
 		this.context = this.activity.getApplicationContext();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
+		prog = new progdialogs(this.activity);
+		password = prefs.getString("password", "genocide212");
 		
 	}
 	
 	@Override
 	protected void onPreExecute(){
 		super.onPreExecute();
-		progdialog = ProgressDialog.show(this.activity, "Search", "Looking for your mimics", true, false);
+	prog.show();
 	}
 	
 	@Override
@@ -43,7 +46,7 @@ public class searchmimicwebtask extends AsyncTask<String, Integer, String>{
 		String query = q[0]; 
 		try{
 			Log.d(debugtag, "profileBackground");
-			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/searchposts/?search="+query+"&format=json", user);
+			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/searchposts/?search="+query+"&format=json", user, password);
 			return result;
 		}
 		catch (Exception e)
@@ -59,7 +62,7 @@ public class searchmimicwebtask extends AsyncTask<String, Integer, String>{
 		
 		ArrayList<MimicData> mimicdata= new ArrayList<MimicData>(); 
 		
-		progdialog.dismiss();
+		
 		
 		
 		if(result.length() == 0){
@@ -99,6 +102,7 @@ public class searchmimicwebtask extends AsyncTask<String, Integer, String>{
 				e.printStackTrace();
 			}
 		this.activity.setMimics(mimicdata);
+		prog.dismiss();
 		}
 		
 		

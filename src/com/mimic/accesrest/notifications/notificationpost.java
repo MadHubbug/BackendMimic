@@ -48,7 +48,7 @@ public class notificationpost extends AsyncTask<String,String,Void> {
 			nameValuePairs.add(new BasicNameValuePair("\"typeofnotif\"", "\""+type+"\""));
 			} else if (type.equals("follows")){
 				nameValuePairs.add(new BasicNameValuePair("\"user\"", user));
-				nameValuePairs.add(new BasicNameValuePair("\"follow\"", username));
+				nameValuePairs.add(new BasicNameValuePair("\"follow\"", "\""+username+"\""));
 				nameValuePairs.add(new BasicNameValuePair("\"typeofnotif\"", "\""+type+"\""));
 			}
 

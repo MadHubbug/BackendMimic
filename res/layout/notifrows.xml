@@ -16,7 +16,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="23dp"
         android:layout_marginTop="0dp"
-        android:src="@drawable/dp" 
+        android:src="@drawable/stub" 
         app:civ_border="true"
         app:civ_border_width="1dp"
         app:civ_border_color="#6A7172"
@@ -75,13 +75,14 @@
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/postclickable"
         android:layout_alignBottom="@+id/postclickable"
-        android:layout_alignParentRight="true"
-   		android:layout_marginRight="25dp"
+        android:layout_alignTop="@+id/postclickable"
+        android:layout_marginLeft="3dp"
+        android:layout_toRightOf="@+id/postclickable"
         android:text="0s"
-        android:textSize="10sp"
+        
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/descriptioncolor"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textSize="10sp" />
 
 </RelativeLayout>

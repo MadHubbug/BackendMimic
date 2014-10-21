@@ -21,7 +21,7 @@ public class hashwebtask extends AsyncTask<String, Integer, String>{
 	private Context context;
 	private hash activity;
 	private static final String debugtag = "profileBackgroundtask";
-	private String user;
+	private String user, password;
 	private progdialogs prog;
 	
 	public hashwebtask (hash activity){
@@ -31,6 +31,7 @@ public class hashwebtask extends AsyncTask<String, Integer, String>{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
 		prog = new progdialogs(this.activity);
+		password = prefs.getString("password", "genocide212");
 		
 	}
 	
@@ -45,7 +46,7 @@ public class hashwebtask extends AsyncTask<String, Integer, String>{
 		String query = q[0]; 
 		try{
 			Log.d(debugtag, "profileBackground");
-			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/searchposts/?search="+query+"&format=json", user);
+			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/searchposts/?search="+query+"&format=json", user, password);
 			return result;
 		}
 		catch (Exception e)

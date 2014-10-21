@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.mimic.accesrest.comment.MyCommentHolder;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -36,13 +37,14 @@ public class commentadapter extends BaseAdapter{
 		int position=-1;
 		private static int not_playing = -1;
 		private final boolean[] mHighlightedPositions = new boolean[100];
-		int initialposition = -1; 
+		public int initialposition = -1; 
 		private int mPlayingPosition = not_playing;
 		private comment commentx;
 		private MediaPlayer player;
 		private ImageLoader imageloader;
 		private Typeface type;
 		private RelativeLayout s;
+		private DisplayImageOptions options;
 		
 	 public commentadapter(Activity a, LayoutInflater l, ArrayList <commentdata> m){
 			
@@ -51,6 +53,14 @@ public class commentadapter extends BaseAdapter{
 			this.commentdata = m;
 //			imageloader=new ImageLoaderConfigurationeLoader();
 			type = Typeface.createFromAsset(a.getAssets(), "fonts/Roboto-Regular.ttf");
+			options = new DisplayImageOptions.Builder()
+			.showImageOnLoading(R.drawable.biggerplay)
+			.showImageForEmptyUri(R.drawable.biggerplay)
+			.showImageOnFail(R.drawable.biggerplay)
+			.cacheInMemory(true)
+			.cacheOnDisk(true)
+			.considerExifParams(true)
+			.build();
         	
 			
 		}
@@ -141,7 +151,31 @@ public class commentadapter extends BaseAdapter{
 					    	
 					    }
 					    
-					    if(initialposition!=-1)
+					    
+
+					    if(position == initialposition){
+					    	if (player.isPlaying()){
+					    	Log.d("Are we going through here?", "stop ");
+					    		player.stop();
+					    		button.setImageResource(R.drawable.playbutton);
+					    		mHighlightedPositions[position] = false;
+					    		initialposition = position;
+					    	      mHighlightedPositions[position] = false;
+					    	
+					    }
+					    else{
+					    	player.stop();
+					    	button.setImageResource(R.drawable.stopbutton);
+					    	startPlaying(url, position);
+					    	initialposition = position;
+					    	mHighlightedPositions[initialposition]=false;
+					        mHighlightedPositions[position] = true;
+					        
+					        Log.d("Are we going through here?", "play same");
+					    }
+					    }
+					    
+					    else if(initialposition!=-1)
 					    {
 					    	if(mHighlightedPositions[position]) {
 					    	button.setImageResource(R.drawable.playbutton);
@@ -204,7 +238,7 @@ public class commentadapter extends BaseAdapter{
 			holder.times.setText(comments.gettimes());
 			holder.times.setTypeface(type);
 			String na = comments.getprofilepictureurl();
-			imageloader.displayImage(na, holder.dp);
+			imageloader.displayImage(na, holder.dp, options);
 			holder.commentplays.setTag(pos);
 			ConvertView.setTag(holder);
 			commentx = (comment) this.activity;

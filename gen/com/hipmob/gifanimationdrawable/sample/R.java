@@ -8,34 +8,34 @@ package com.hipmob.gifanimationdrawable.sample;
 
 public final class R {
 	public static final class dimen {
-		public static final int activity_horizontal_margin = 0x7f060000;
-		public static final int activity_vertical_margin = 0x7f060001;
+		public static final int activity_horizontal_margin = 0x7f0a0003;
+		public static final int activity_vertical_margin = 0x7f0a0004;
 	}
 	public static final class drawable {
-		public static final int ic_launcher = 0x7f0200af;
+		public static final int ic_launcher = 0x7f0200b3;
 	}
 	public static final class id {
-		public static final int action_settings = 0x7f0900ce;
-		public static final int imagebutton = 0x7f09003d;
-		public static final int imageview = 0x7f09003e;
+		public static final int action_settings = 0x7f0800f4;
+		public static final int imagebutton = 0x7f08003d;
+		public static final int imageview = 0x7f08003e;
 	}
 	public static final class layout {
 		public static final int activity_display_gif = 0x7f030015;
 	}
 	public static final class menu {
-		public static final int display_gi = 0x7f0d0001;
+		public static final int display_gi = 0x7f0e0001;
 	}
 	public static final class raw {
 		public static final int anim1 = 0x7f050001;
 		public static final int anim2 = 0x7f050002;
 	}
 	public static final class string {
-		public static final int action_settings = 0x7f070001;
-		public static final int app_name = 0x7f070000;
-		public static final int hello_world = 0x7f070002;
+		public static final int action_settings = 0x7f06007d;
+		public static final int app_name = 0x7f06007c;
+		public static final int hello_world = 0x7f06007e;
 	}
 	public static final class style {
-		public static final int AppBaseTheme = 0x7f080000;
-		public static final int AppTheme = 0x7f080001;
+		public static final int AppBaseTheme = 0x7f0d0003;
+		public static final int AppTheme = 0x7f0d0004;
 	}
 }

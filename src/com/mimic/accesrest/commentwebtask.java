@@ -20,7 +20,7 @@ public class commentwebtask extends AsyncTask<Integer, Integer, String>{
 		private Context context;
 		private comment activity;
 		private static final String debugtag = "Backgroundtask";
-		private String user;
+		private String user, password;
 		
 		public commentwebtask(comment comment){
 			super();
@@ -28,13 +28,15 @@ public class commentwebtask extends AsyncTask<Integer, Integer, String>{
 			this.context = this.activity.getApplicationContext();		
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 			user = prefs.getString("username", "madfresco");
+			password = prefs.getString("password", "genocide212");
+			
 			
 		}
 		
 		@Override
 		protected void onPreExecute(){
 			super.onPreExecute();
-			progdialog = ProgressDialog.show(this.activity, "Search", "Looking for mimics", true, false);
+//			progdialog = ProgressDialog.show(this.activity, "Search", "Looking for mimics", true, false);
 		}
 		
 		@Override
@@ -43,7 +45,7 @@ public class commentwebtask extends AsyncTask<Integer, Integer, String>{
 			
 			try{
 				Log.d(debugtag, "Background");
-				String result = commentdatahelper.downloadFromServer(post, user);
+				String result = commentdatahelper.downloadFromServer(post, user, password);
 				return result;
 			}
 			catch (Exception e)
@@ -59,7 +61,7 @@ public class commentwebtask extends AsyncTask<Integer, Integer, String>{
 			
 			ArrayList<MimicData> playdata = new ArrayList<MimicData>(); 
 			ArrayList<commentdata> commentdata = new ArrayList<commentdata>();
-			progdialog.dismiss();
+//			progdialog.dismiss();
 			
 			
 			if(result.length() == 0){	

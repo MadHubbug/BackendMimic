@@ -24,15 +24,18 @@ public class dislike extends AsyncTask<String,String,Void> {
 	protected Void doInBackground(String... params) {
 		
 		String post = params[0];
-
+		String user = params[1];
+		
+		
 		try {
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			Log.d("appache", "httpclient");        
-			HttpDelete postRequest = new HttpDelete("http://192.168.5.105:8000/likes/?user=1&post="+post);
+			HttpDelete postRequest = new HttpDelete("http://mimictheapp.herokuapp.com/likes/?user="+user+"&post="+post);
 			postRequest.addHeader("Authorization", "Basic " + Base64.encodeToString(("madfresco"+":"+"genesis09").getBytes(), Base64.NO_WRAP));
 			postRequest.setHeader("Content-type","application/json");
-			httpClient.execute(postRequest);
-			Log.d("apache", "noresponse");  
+			HttpResponse response = httpClient.execute(postRequest);
+			
+			Log.d("apache", response.getEntity()+ " ");  
 
 			System.out.println("Output from Server .... \n");
 

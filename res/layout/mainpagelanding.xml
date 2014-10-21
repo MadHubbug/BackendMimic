@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:alpha="80"
     android:background="@drawable/landing"
-    android:theme="@android:style/Theme.DeviceDefault.NoActionBar" >
+    >
 
     <com.facebook.widget.LoginButton
         android:id="@+id/fbloginlanding"
@@ -22,7 +22,8 @@
         android:text="Sign Up with Facebook"
         android:textColor="@android:color/white"
         android:textStyle="bold"
-        android:typeface="sans" />
+        android:typeface="sans" 
+        android:layout_marginTop="10dp"/>
 
     <Button
         android:id="@+id/Signuplanding"
@@ -33,9 +34,24 @@
         android:layout_alignRight="@+id/fbloginlanding"
         android:layout_marginBottom="34dp"
         android:layout_marginTop="10dp"
-        android:background="@color/greyx"
+ android:background="@drawable/rounds"
         android:paddingTop="0dp"
         android:text="Sign up with your email"
+        android:textColor="@android:color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+    <Button
+        android:id="@+id/LoginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/fbloginlanding"
+        android:layout_alignLeft="@+id/fbloginlanding"
+        android:layout_alignRight="@+id/fbloginlanding"
+        android:background="@drawable/round"
+        android:paddingTop="0dp"
+        android:text="Login to your account"
         android:textColor="@android:color/white"
         android:textSize="18dp"
         android:textStyle="bold"

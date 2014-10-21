@@ -42,7 +42,7 @@
         android:layout_alignLeft="@+id/twittershare"
         android:layout_below="@+id/description"
         android:layout_marginTop="17dp"
-        android:text="Share"
+        android:text="SHARE"
         android:textColor="@color/descriptioncolor"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 

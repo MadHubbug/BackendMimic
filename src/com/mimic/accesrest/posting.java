@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,6 +51,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.MultiAutoCompleteTextView.Tokenizer;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -60,8 +64,14 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
+import com.facebook.FacebookRequestError;
+import com.facebook.HttpMethod;
+import com.facebook.Request;
+import com.facebook.RequestAsyncTask;
+import com.facebook.Response;
+import com.facebook.Session;
 import com.parse.ParsePush;
-import com.stream.aws.Response;
+
 
 
 
@@ -77,6 +87,7 @@ public class posting extends SherlockActivity implements OnClickListener{
 	private static String Title = null;
 	private ImageButton play;
 	private boolean mStartPlaying = true;
+	private boolean fbclicked = false;
 	private String user, username, id;
 	private SharedPreferences prefs;
 	private MultiAutoCompleteTextView autoComplete;
@@ -85,6 +96,19 @@ public class posting extends SherlockActivity implements OnClickListener{
 	private ArrayList<String> usernames;
 	private int page = 1;
 	private dropdownwebtask task;
+	private String fbid;
+	private static final List<String> PERMISSIONS = Arrays.asList("publish_actions");
+	private static final String PENDING_PUBLISH_KEY = "pendingPublishReauthorization";
+	private boolean pendingPublishReauthorization = false;
+	private com.stream.aws.Response s = new com.stream.aws.Response(page, fbid);
+	private ProgressDialog progress;
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    super.onActivityResult(requestCode, resultCode, data);
+	   Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+
+	}
 	
     private void onPlay(boolean start){
 		if(start){
@@ -148,7 +172,7 @@ public class posting extends SherlockActivity implements OnClickListener{
 		mFileName = bundle.getString("audiofile");
 		Log.d(LOG_TAG, mFileName);
 		((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-		SpannableString s = new SpannableString("Post");
+		SpannableString s = new SpannableString("POST TO YOUR FEED");
 		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F86960")));
 		s.setSpan(new Typefacespan(this, "Roboto-Medium.ttf"), 0, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		getSupportActionBar().setTitle(s);
@@ -157,10 +181,12 @@ public class posting extends SherlockActivity implements OnClickListener{
 		getSupportActionBar().setIcon(R.drawable.back);
 		username = prefs.getString("username", "madfresco");
 		user = prefs.getString("profileid", "0");
+		fbid = prefs.getString("fbid", "0");
 		ImageView view = (ImageView) findViewById(android.R.id.home);
 		final ImageButton tw = (ImageButton) findViewById(R.id.twittershare);
 		usernames = new ArrayList<String>();
 		mimic(page);
+		new bucketwebtask(this).execute();
 		
 		tw.setOnClickListener(new OnClickListener(){
 			boolean l = true;
@@ -182,10 +208,22 @@ public class posting extends SherlockActivity implements OnClickListener{
 			@Override
 			public void onClick(View arg0) {
 				if(v){
-				fb.setImageResource(R.drawable.facebookclicked);
+					 Session session = Session.getActiveSession();
+					    if (!session.isOpened() || session == null){
+							Session.openActiveSession(posting.this, true, null);
+							fbclicked=true;
+					    Log.d("clicked", "no session");
+					    }
+					    
+					    if (session != null){
+					    	Log.d("clicked", "with session");
+					    	fb.setImageResource(R.drawable.facebookclicked);
+					fbclicked=true;
+		}
 				
 			}else{
 				fb.setImageResource(R.drawable.facebooknot);
+				fbclicked=false;
 				
 			}
 				v = !v;
@@ -294,10 +332,15 @@ public class posting extends SherlockActivity implements OnClickListener{
 	   switch (item.getItemId()) {
 	      case R.id.contin:
 	    	  Title = autoComplete.getText().toString();
-	    	 
+	    	  if (fbclicked){
+					publishStory();
+					Log.d(LOG_TAG, "here");
+					}
+					Log.d(LOG_TAG, fbclicked + " ");
 
 	    	  
 	    	  new ValidateCredentialsTask().execute();
+	    	  progress = ProgressDialog.show(posting.this, "Posting", "Uploading your mimic now!");
 	    	  ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(autoComplete.getWindowToken(), 0);
 	      	
 	        case android.R.id.home:
@@ -316,16 +359,16 @@ public class posting extends SherlockActivity implements OnClickListener{
 	}
 	
 	private class ValidateCredentialsTask extends
-	AsyncTask<Void, Void, Response> {
+	AsyncTask<Void, Void, com.stream.aws.Response> {
 
 		@Override
-		protected Response doInBackground(Void... arg0) {
+		protected com.stream.aws.Response doInBackground(Void... arg0) {
 
 
 			return posting.clientManager.validateCredentials();
 		}
 		@Override
-		protected void onPostExecute(Response response) {
+		protected void onPostExecute(com.stream.aws.Response response) {
 			Createbucket bucket = new Createbucket();
 			bucket.execute(response);
 			Log.d(LOG_TAG, "onpostexecute");
@@ -338,14 +381,14 @@ public class posting extends SherlockActivity implements OnClickListener{
 	}
 	
 	public class Createbucket extends
-	AsyncTask<Response, Void, String> {
+	AsyncTask<com.stream.aws.Response, Void, String> {
 
 
 		private String data = null;
 		@Override
-		protected String doInBackground(Response... responses) {
+		protected String doInBackground(com.stream.aws.Response... responses) {
 
-			Response response = responses[0];
+			com.stream.aws.Response response = responses[0];
 			if (response != null && response.requestWasSuccessful()) {
 				Log.d(LOG_TAG, "Validated");
 				TransferManager manager = new TransferManager(clientManager.s3());
@@ -353,13 +396,15 @@ public class posting extends SherlockActivity implements OnClickListener{
 				File filex = new File(mFileName);
 				AmazonS3Client s3Client = clientManager.s3();
 				try{
-					String firstWord= Title.substring(0, Title.indexOf(" ")); 
-					Long timestamp =  (System.currentTimeMillis()/60000);
+//					String firstWord= Title.substring(0, Title.indexOf(" ")); 
+					Long timestamp =  (System.currentTimeMillis()/1000);
 					String time = timestamp.toString();
+					
 					final ObjectMetadata metx = new ObjectMetadata();
 					metx.addUserMetadata("Content-Type", "audio/x-wav");
-					String bucket = prefs.getString("bucket", "no buckket");
-					PutObjectRequest por = new PutObjectRequest(bucket, firstWord+time+".wav", filex);
+					
+					Log.d("bucketname", bucketname);
+					PutObjectRequest por = new PutObjectRequest(bucketname, "mimic"+time+".wav", filex);
 					por.withMetadata(metx);
 					por.withCannedAcl(CannedAccessControlList.PublicRead);
 					Upload upload = manager.upload(por);
@@ -370,16 +415,17 @@ public class posting extends SherlockActivity implements OnClickListener{
 					} 
 
 					Log.d(LOG_TAG, upload.getDescription());
-					newurl = s3Client.getUrl(bucket, firstWord+time+".wav");
+					newurl = s3Client.getUrl(bucketname, "mimic"+time+".wav");
 				
 					Log.d(LOG_TAG, "creating object");
 				
-					Log.d(LOG_TAG, data);
+//					Log.d(LOG_TAG, data);
 
 					Log.d(LOG_TAG, "posting data");
 				}
 				catch (Exception exception){
 					Log.d(LOG_TAG, "catching error");
+					Log.d("Exception", exception+ " ");
 				}
 
 
@@ -397,9 +443,8 @@ public class posting extends SherlockActivity implements OnClickListener{
 				Log.d(LOG_TAG, "Thisis");
 				post.execute("http://mimictheapp.herokuapp.com/posts/");
 				Log.d(LOG_TAG, "Executing gg");
-		    	Intent i = new Intent(posting.this,MainActivity.class);
-		      	startActivity(i);
-		      	finish();
+				
+		    	
 
 
 			}catch (Exception exception){
@@ -457,6 +502,8 @@ public class posting extends SherlockActivity implements OnClickListener{
 				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
 				
 				nameValuePairs.add(new BasicNameValuePair("\"user\"", user));
+				Log.d("newurl", newurl+ " ");
+		
 				nameValuePairs.add(new BasicNameValuePair("\"posturls\"", "\""+newurl.toString()+"\""));
 				nameValuePairs.add(new BasicNameValuePair("\"likes\"", x)); 
 				nameValuePairs.add(new BasicNameValuePair("\"commentcounter\"", x));
@@ -584,9 +631,91 @@ public class posting extends SherlockActivity implements OnClickListener{
 		
 	}
 
+	public void setUsers(String bucket) {
+		this.bucketname = bucket;
+		
+	}
+
+	private void publishStory() {
+	    Session session = Session.getActiveSession();
+	    Log.d("session", session.getState()+ " ");
+	 
+	    if (session != null){
+
+	        // Check for publish permissions    
+	        List<String> permissions = session.getPermissions();
+	        if (!isSubsetOf(PERMISSIONS, permissions)) {
+	            pendingPublishReauthorization = true;
+	            Session.NewPermissionsRequest newPermissionsRequest = new Session
+	                    .NewPermissionsRequest(this, PERMISSIONS);
+	        session.requestNewPublishPermissions(newPermissionsRequest);
+	        Log.d("here?","permisions?");
+    
+	        return;
+	            	        }
+	        Log.d("Is it here?", "here");
+	        Bundle postParams = new Bundle();
+	        postParams.putString("name", Title);
+	        postParams.putString("caption", "Download the app now to listen to this mimic!");
+	        postParams.putString("link", "https://play.google.com/store/apps/details?id=com.mimic.accesrest");
+	        postParams.putString("picture", "http://graph.facebook.com/mimictheapp/picture?type=large");
+	        Log.d("Postparams", "params");
+	        Request.Callback callback= new Request.Callback() {
+	            @Override
+	        	public void onCompleted(Response response) {
+	                JSONObject graphResponse = response
+	                                           .getGraphObject()
+	                                           .getInnerJSONObject();
+	                String postId = null;
+	                try {
+	                    postId = graphResponse.getString("id");
+	                } catch (JSONException e) {
+	                    Log.i("Posting",
+	                        "JSON error "+ e.getMessage());
+	                }
+	                FacebookRequestError error = response.getError();
+	                Log.d("callback", "callback");
+	                if (error != null) {
+	                    Toast.makeText(posting.this
+	                         .getApplicationContext(),
+	                         error.getErrorMessage(),
+	                         Toast.LENGTH_SHORT).show();
+	                    } else {
+	                        Toast.makeText(posting.this
+	                             .getApplicationContext(), 
+	                             postId,
+	                             Toast.LENGTH_LONG).show();
+	                }
+	            }
+	        };
+
+	        Request request = new Request(session, "me/feed", postParams, 
+	                              HttpMethod.POST, callback);
+
+	        RequestAsyncTask task = new RequestAsyncTask(request);
+	        task.execute();
+	        Log.d("Executed", "execute");
+	        progress.dismiss();
+	    	Intent i = new Intent(posting.this,MainActivity.class);
+	      	startActivity(i);
+	      	Log.d(LOG_TAG, "starting activity");
+	      	finish();
+	    }
+		}
 	
 	
-	
+	private boolean isSubsetOf(Collection<String> subset, Collection<String> superset) {
+	    for (String string : subset) {
+	        if (!superset.contains(string)) {
+	        	Log.d("here?","permisions? false");
+
+	        	return false;
+	        }
+	    }
+	    Log.d("here?","permisions? true");
+
+	    return true;
+	}	
 	
 	
 	

@@ -21,20 +21,21 @@ public class followwebtask extends AsyncTask<String, Integer, String>{
 	private Context context;
 	private followinglist activity;
 	private static final String debugtag = "profileBackgroundtask";
-	private String user, label;
+	private String user, label, password;
 	public followwebtask (followinglist activity){
 		super();
 		this.activity = activity; 
 		this.context = this.activity.getApplicationContext();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("username", "madfresco");
+		password = prefs.getString("password", "genocide212");
 		
 	}
 	
 	@Override
 	protected void onPreExecute(){
 		super.onPreExecute();
-		progdialog = ProgressDialog.show(this.activity, "Search", "Looking for your mimics", true, false);
+		
 	}
 	
 	@Override
@@ -42,9 +43,10 @@ public class followwebtask extends AsyncTask<String, Integer, String>{
 		String query = q[0];
 		String label = q[1];
 		this.label = label;
+		String k = q[2];
 		try{
 			Log.d(debugtag, "profileBackground");
-			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/follows/?"+this.label+"="+query+"&format=json", user);
+			String result = Mimicdatahelper.downloadFromServer("http://mimictheapp.herokuapp.com/follows/?"+this.label+"="+query+"&format=json&page="+k, user, password);
 			return result;
 		}
 		catch (Exception e)
@@ -59,8 +61,7 @@ public class followwebtask extends AsyncTask<String, Integer, String>{
 	protected void onPostExecute(String result){
 		
 		ArrayList<searchdata> searchdata = new ArrayList<searchdata>(); 
-		
-		progdialog.dismiss();
+	
 		
 		
 		if(result.length() == 0){
@@ -72,6 +73,7 @@ public class followwebtask extends AsyncTask<String, Integer, String>{
 		try{
 			Log.d("working?", "following");
 			JSONObject x  = new JSONObject(result);
+			String next = x.getString("next");
 			JSONArray respobj = x.getJSONArray("results");
 			for (int i=0; i<respobj.length(); i++){
 			JSONObject returnval = respobj.getJSONObject(i);
@@ -81,7 +83,15 @@ public class followwebtask extends AsyncTask<String, Integer, String>{
 			String dp = follower.getString("profilepictureurl");
 			String profileurl = follower.getString("url");
 			Boolean follows = false;
-			searchdata.add(new searchdata(username, dp, follows, profid, profileurl));
+			if (next == "null"){
+				Log.d("ending", "end is here");
+
+				searchdata.add(new searchdata(username, dp, follows, profid, profileurl, false));
+			}else{
+
+				searchdata.add(new searchdata(username, dp, follows, profid, profileurl, true));
+			}
+			
 			
 			}
 			
@@ -98,6 +108,7 @@ public class followwebtask extends AsyncTask<String, Integer, String>{
 				Log.d("working?", "follower");
 				JSONObject x  = new JSONObject(result);
 				JSONArray respobj = x.getJSONArray("results");
+				String next = x.getString("next");
 				for (int i=0; i<respobj.length(); i++){
 				JSONObject returnval = respobj.getJSONObject(i);
 				JSONObject following = returnval.getJSONObject("following"); 
@@ -106,7 +117,17 @@ public class followwebtask extends AsyncTask<String, Integer, String>{
 				String dp = following.getString("profilepictureurl");
 				String profileurl = following.getString("url");
 				Boolean follows = false;
-				searchdata.add(new searchdata(username, dp, follows, profid, profileurl));
+				if (next == "null"){
+					Log.d("ending", "end is here");
+
+					searchdata.add(new searchdata(username, dp, follows, profid, profileurl, false));
+				}else{
+
+					searchdata.add(new searchdata(username, dp, follows, profid, profileurl, true));
+				}
+				
+				
+				
 				Log.d("profid", profid+"");
 				}
 				

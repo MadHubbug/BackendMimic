@@ -30,7 +30,9 @@ public class searchadapter extends BaseAdapter{
 	private boolean checker = true;
 	private boolean[] followedpositions = new boolean[50];
 	private String profileurl, user, actualuser, username;
-public searchadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
+
+	
+	public searchadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 		
 		this.activity = a;
 		this.layoutinflater = l;
@@ -39,7 +41,7 @@ public searchadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		user = prefs.getString("profileid", "0");
 		actualuser = prefs.getString("username", "0");
-		
+		Log.d("user", user + " ");
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public searchadapter(Activity a, LayoutInflater l, ArrayList <searchdata> m){
 						Log.d("What is holder?", "Holder: "+ y);
 						Log.d("What is holder?", "Holder: "+ a);
 						followedpositions[a] = false;
-						unfollow.execute(x);
+						unfollow.execute(x, user);
 						//notifyDataSetChanged();
 						
 						holder.follow.setImageResource(R.drawable.follow);			

@@ -52,7 +52,7 @@ public class Notifications extends SherlockActivity implements OnClickListener{
 		s.setSpan(new Typefacespan(this, "Roboto-Medium.ttf"), 0, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		getSupportActionBar().setTitle(s);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		this.notiflist= (ListView) findViewById(R.id.notifview);
+		this.notiflist = (ListView) findViewById(R.id.notifview);
 //		this.notiflist.setDivider(null);
 		this.layoutinflater = LayoutInflater.from(this);
 		ImageButton a = (ImageButton) findViewById(R.id.postbuttonnotifpage);
